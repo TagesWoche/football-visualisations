@@ -56,6 +56,10 @@ class @SoccerMap extends RaphaelMap
         
       lastPosition = if scene.end then scene.end else scene.start
     
+    # draw goal
+    if lastPosition
+      @drawGoal(lastPosition)
+    
   drawPositions: ->
     for scene in @scenes
       startCircleRadius = @circleRadius
@@ -81,21 +85,30 @@ class @SoccerMap extends RaphaelMap
     endGap = 16
     length = Raphael.getTotalLength(path)
     subCurve = Raphael.getSubpath(path, startGap, (length - endGap) )
-    @drawArrow(path, (length - endGap))
+    @drawArrow(path, { length: (length - endGap) })
     
     @map.path(subCurve).attr({ fill:"", stroke: @white, "stroke-width": 2 })
     
-  
-  drawArrow: (path, endLength) ->
-    arrowSize = 10
+  drawGoal: (start) ->
+    end = field.goalPosition()
+    path = curve.curve(start, end, "10%", 0.6, "right")
+    @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })
+    @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": 3 })
+    
+  drawArrow: (path, { length, size, pointyness, strokeWidth, color }) ->
+    length ?= Raphael.getTotalLength(path)
+    size ?= 10
+    pointyness ?= 0.3
+    strokeWidth ?= 2
+    color ?= @white
     
     # only draw arrowhead if the length of the path is sufficient
-    if (endLength - arrowSize) > 30
-      base = Raphael.getPointAtLength(path, endLength - arrowSize)
-      tip = Raphael.getPointAtLength(path, endLength)
-      arrowhead = curve.arrow(base, tip, 0.3)
+    if (length - size) > 30
+      base = Raphael.getPointAtLength(path, length - size)
+      tip = Raphael.getPointAtLength(path, length)
+      arrowhead = curve.arrow(base, tip, pointyness)
       
-      @map.path(arrowhead).attr({ fill:"", stroke: @white, "stroke-width": 2 })
+      @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth })
       
     
   label: (position, label) ->

@@ -35,6 +35,18 @@ tageswoche.field = do ->
   
     { x: @scale * x, y: @scale * y }
 
+  goalPosition: () ->
+    position = { horizontal: 1, vertical: 6 }
+    
+    # calculate x and y positions
+    x = 15
+  
+    y = 5
+    for height, index in @heights when (index + 1) < position.vertical
+      y += height
+      
+    { x: @scale * x, y: @scale * y }
+  
   # transform "B3" in { horizontal: 2, vertical: 3 }
   # optionally mirror the position ("B3" -> "Q9" -> { horizontal: 17, vertical: 9})
   parsePosition: (position, mirror = false) ->

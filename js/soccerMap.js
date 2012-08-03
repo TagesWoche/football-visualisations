@@ -70,10 +70,9 @@
     };
 
     SoccerMap.prototype.drawPasses = function() {
-      var lastPosition, scene, _i, _len, _ref, _results;
+      var lastPosition, scene, _i, _len, _ref;
       lastPosition = void 0;
       _ref = this.scenes;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         scene = _ref[_i];
         if (scene.end) {
@@ -82,9 +81,11 @@
         if (lastPosition) {
           this.addPass(lastPosition, scene.start);
         }
-        _results.push(lastPosition = scene.end ? scene.end : scene.start);
+        lastPosition = scene.end ? scene.end : scene.start;
       }
-      return _results;
+      if (lastPosition) {
+        return this.drawGoal(lastPosition);
+      }
     };
 
     SoccerMap.prototype.drawPositions = function() {
@@ -128,7 +129,9 @@
       endGap = 16;
       length = Raphael.getTotalLength(path);
       subCurve = Raphael.getSubpath(path, startGap, length - endGap);
-      this.drawArrow(path, length - endGap);
+      this.drawArrow(path, {
+        length: length - endGap
+      });
       return this.map.path(subCurve).attr({
         fill: "",
         stroke: this.white,
@@ -136,17 +139,48 @@
       });
     };
 
-    SoccerMap.prototype.drawArrow = function(path, endLength) {
-      var arrowSize, arrowhead, base, tip;
-      arrowSize = 10;
-      if ((endLength - arrowSize) > 30) {
-        base = Raphael.getPointAtLength(path, endLength - arrowSize);
-        tip = Raphael.getPointAtLength(path, endLength);
-        arrowhead = curve.arrow(base, tip, 0.3);
+    SoccerMap.prototype.drawGoal = function(start) {
+      var end, path;
+      end = field.goalPosition();
+      path = curve.curve(start, end, "10%", 0.6, "right");
+      this.drawArrow(path, {
+        size: 10,
+        pointyness: 0.3,
+        strokeWidth: 3
+      });
+      return this.map.path(path).attr({
+        fill: "",
+        stroke: this.white,
+        "stroke-width": 3
+      });
+    };
+
+    SoccerMap.prototype.drawArrow = function(path, _arg) {
+      var arrowhead, base, color, length, pointyness, size, strokeWidth, tip;
+      length = _arg.length, size = _arg.size, pointyness = _arg.pointyness, strokeWidth = _arg.strokeWidth, color = _arg.color;
+      if (length == null) {
+        length = Raphael.getTotalLength(path);
+      }
+      if (size == null) {
+        size = 10;
+      }
+      if (pointyness == null) {
+        pointyness = 0.3;
+      }
+      if (strokeWidth == null) {
+        strokeWidth = 2;
+      }
+      if (color == null) {
+        color = this.white;
+      }
+      if ((length - size) > 30) {
+        base = Raphael.getPointAtLength(path, length - size);
+        tip = Raphael.getPointAtLength(path, length);
+        arrowhead = curve.arrow(base, tip, pointyness);
         return this.map.path(arrowhead).attr({
           fill: "",
-          stroke: this.white,
-          "stroke-width": 2
+          stroke: color,
+          "stroke-width": strokeWidth
         });
       }
     };
