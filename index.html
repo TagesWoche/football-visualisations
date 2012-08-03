@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Tageswoche - Spielszenen</title>
+    
+    <link href="css/spielszenen.css" rel="stylesheet">
+    
+    <script src="js/vendor/jquery-1.7.2.min.js"></script>
+    <script src="js/vendor/raphael-min.js"></script>
+    <script src="js/field.js"></script>
+    <script src="js/curve.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/raphaelMap.js"></script>
+    <script src="js/soccerMap.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="result">
+        <span class="left">FCB</span>
+        <span class="score">2:1</span>
+        <span class="right">GC</span>
+      </div>
+      <div id="spielszenen" class="clear">
+      
+      </div>
+    </div>
+  
+  <script>
+  $(document).ready(function() {
+    width = $("#spielszenen").width();
+    tageswoche.field.setup("spielszenen", width);
+  });
+  </script>
+  </body>
+</html>

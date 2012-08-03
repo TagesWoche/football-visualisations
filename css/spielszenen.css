@@ -1,0 +1,49 @@
+
+#container {
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+#spielszenen {
+  background: green;
+  background: url(../img/fussballfeld-grid.jpg) no-repeat;
+  background-size: contain;
+  padding: 2.9% 3%;
+}
+
+
+#result {
+  margin: 3px 0;
+  height: 30px;
+}
+
+#result span {
+  float: left;
+  display: inline-box;
+  line-height: 30px;
+}
+
+#result .left {
+  width: 42%;
+  text-align: right;
+}
+
+#result .score {
+  width: 16%;
+  font-size: 30px;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+#result .right {
+  width: 42%;
+}
+
+/*circle {
+  background: #EE402F;
+  box-shadow: 1px, 1px, 4px, rgba(0, 0, 0, 0.5);
+}*/
+
+.clear {
+  clear: both;
+}
