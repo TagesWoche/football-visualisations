@@ -26,7 +26,8 @@
       field.scale = width / field.originalWidth;
       height = width / field.widthHeightRelation;
       SoccerMap.__super__.constructor.call(this, container, width, height);
-      this.scenes = [];
+      this.scene = void 0;
+      this.actions = [];
       this.red = "#EE402F";
       this.blue = "#0051A3";
       this.white = "#FFFFFF";
@@ -39,49 +40,59 @@
           "stroke-linejoin": "round"
         }
       };
-      this.setup();
+      this.nextScene();
     }
 
-    SoccerMap.prototype.setup = function(container, width) {
+    SoccerMap.prototype.nextScene = function() {
       var _this = this;
       return data.loadScenes(function(error, scenes) {
-        var action, scene, _i, _len, _ref;
-        scene = data.nextScene();
-        _ref = scene.actions;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          action = _ref[_i];
-          action.start = field.calcPosition(action.start);
-          if (action.end) {
-            action.end = field.calcPosition(action.end);
-          }
-          _this.addScene(action);
-        }
+        _this.scene = data.nextScene();
         return _this.draw();
       });
     };
 
-    SoccerMap.prototype.addScene = function(scene) {
-      return this.scenes.push(scene);
+    SoccerMap.prototype.previousScene = function() {
+      var _this = this;
+      return data.loadScenes(function(error, scenes) {
+        _this.scene = data.previousScene();
+        return _this.draw();
+      });
     };
 
     SoccerMap.prototype.draw = function() {
+      var action, _i, _len, _ref;
+      this.actions = this.scene.actions;
+      _ref = this.actions;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        action = _ref[_i];
+        action.start = field.calcPosition(action.start);
+        if (action.end) {
+          action.end = field.calcPosition(action.end);
+        }
+      }
+      this.map.clear();
+      this.updateInfo();
       this.drawPasses();
       return this.drawPositions();
     };
 
+    SoccerMap.prototype.updateInfo = function() {
+      return $("#result .score").html(this.scene.score);
+    };
+
     SoccerMap.prototype.drawPasses = function() {
-      var lastPosition, scene, _i, _len, _ref;
+      var action, lastPosition, _i, _len, _ref;
       lastPosition = void 0;
-      _ref = this.scenes;
+      _ref = this.actions;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        scene = _ref[_i];
-        if (scene.end) {
-          this.drawSprint(scene.start, scene.end);
+        action = _ref[_i];
+        if (action.end) {
+          this.drawSprint(action.start, action.end);
         }
         if (lastPosition) {
-          this.addPass(lastPosition, scene.start);
+          this.addPass(lastPosition, action.start);
         }
-        lastPosition = scene.end ? scene.end : scene.start;
+        lastPosition = action.end ? action.end : action.start;
       }
       if (lastPosition) {
         return this.drawGoal(lastPosition);
@@ -89,22 +100,22 @@
     };
 
     SoccerMap.prototype.drawPositions = function() {
-      var drawStartLabel, scene, startCircleRadius, _i, _len, _ref, _results;
-      _ref = this.scenes;
+      var action, drawStartLabel, startCircleRadius, _i, _len, _ref, _results;
+      _ref = this.actions;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        scene = _ref[_i];
+        action = _ref[_i];
         startCircleRadius = this.circleRadius;
         drawStartLabel = true;
-        if (scene.end) {
-          this.map.circle(scene.end.x, scene.end.y, this.circleRadius).attr(this.pathAttributes["default"]);
-          this.label(scene.end, scene.number);
+        if (action.end) {
+          this.map.circle(action.end.x, action.end.y, this.circleRadius).attr(this.pathAttributes["default"]);
+          this.label(action.end, action.number);
           startCircleRadius = startCircleRadius / 2;
           drawStartLabel = false;
         }
-        this.map.circle(scene.start.x, scene.start.y, startCircleRadius).attr(this.pathAttributes["default"]);
+        this.map.circle(action.start.x, action.start.y, startCircleRadius).attr(this.pathAttributes["default"]);
         if (drawStartLabel) {
-          _results.push(this.label(scene.start, scene.number));
+          _results.push(this.label(action.start, action.number));
         } else {
           _results.push(void 0);
         }

@@ -10,7 +10,8 @@ class @SoccerMap extends RaphaelMap
     height = width / field.widthHeightRelation
     super(container, width, height)
     
-    @scenes = []
+    @scene = undefined
+    @actions = []
     
     @red = "#EE402F"
     @blue = "#0051A3"
@@ -24,55 +25,63 @@ class @SoccerMap extends RaphaelMap
         "stroke-width": 1.0
         "stroke-linejoin": "round"
         
-    @setup()
+    @nextScene()
   
-  # Setup
-  setup: (container, width) ->
-
+  nextScene: () ->
     data.loadScenes (error, scenes) =>
-      scene = data.nextScene()
-      for action in scene.actions
-        action.start = field.calcPosition(action.start)
-        action.end = field.calcPosition(action.end) if action.end
-        @addScene(action)
-
+      @scene = data.nextScene()
       @draw()
-          
-  addScene: (scene) ->
-    @scenes.push( scene ) 
+  
+  previousScene: () ->
+    data.loadScenes (error, scenes) =>
+      @scene = data.previousScene()
+      @draw()
   
   draw: ->
+    @actions = @scene.actions
+    
+    # prepare the positions
+    for action in @actions
+      action.start = field.calcPosition(action.start)
+      action.end = field.calcPosition(action.end) if action.end
+    
+    # draw visualization elements
+    @map.clear()
+    @updateInfo()
     @drawPasses()
     @drawPositions()
-      
+  
+  updateInfo: ->
+    $("#result .score").html(@scene.score)
+    
   drawPasses: ->
     lastPosition = undefined
-    for scene in @scenes
-      if scene.end
-        @drawSprint(scene.start, scene.end)
+    for action in @actions
+      if action.end
+        @drawSprint(action.start, action.end)
         
       if lastPosition
-        @addPass(lastPosition, scene.start)
+        @addPass(lastPosition, action.start)
         
-      lastPosition = if scene.end then scene.end else scene.start
+      lastPosition = if action.end then action.end else action.start
     
     # draw goal
     if lastPosition
       @drawGoal(lastPosition)
     
   drawPositions: ->
-    for scene in @scenes
+    for action in @actions
       startCircleRadius = @circleRadius
       drawStartLabel = true
       
-      if scene.end
-        @map.circle(scene.end.x, scene.end.y, @circleRadius).attr(@pathAttributes.default)
-        @label(scene.end, scene.number)
+      if action.end
+        @map.circle(action.end.x, action.end.y, @circleRadius).attr(@pathAttributes.default)
+        @label(action.end, action.number)
         startCircleRadius = startCircleRadius / 2
         drawStartLabel = false
         
-      @map.circle(scene.start.x, scene.start.y, startCircleRadius).attr(@pathAttributes.default)
-      @label(scene.start, scene.number) if drawStartLabel
+      @map.circle(action.start.x, action.start.y, startCircleRadius).attr(@pathAttributes.default)
+      @label(action.start, action.number) if drawStartLabel
   
   drawSprint: (start, end) ->
     # path = curve.line(start, end)
