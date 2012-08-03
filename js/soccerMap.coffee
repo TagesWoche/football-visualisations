@@ -1,9 +1,13 @@
 ### NATIONALRAT CLASS ###
 class @SoccerMap extends RaphaelMap
   curve = tageswoche.curve
+  field = tageswoche.field
+  data = tageswoche.data
   
-  constructor: (container, width, height, @settings = {}) ->
+  constructor: (container, width, @settings = {}) ->
     self = this
+    field.scale = width / field.originalWidth
+    height = width / field.widthHeightRelation
     super(container, width, height)
     
     @scenes = []
@@ -19,7 +23,20 @@ class @SoccerMap extends RaphaelMap
         stroke: ""
         "stroke-width": 1.0
         "stroke-linejoin": "round"
-    
+        
+    @setup()
+  
+  # Setup
+  setup: (container, width) ->
+
+    scene = data.nextScene()
+    for action in scene.actions
+      action.start = field.calcPosition(action.start)
+      action.end = field.calcPosition(action.end) if action.end
+      @addScene(action)
+
+    @draw()
+          
   addScene: (scene) ->
     @scenes.push( scene ) 
   

@@ -9,16 +9,22 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   this.SoccerMap = (function(_super) {
-    var curve;
+    var curve, data, field;
 
     __extends(SoccerMap, _super);
 
     curve = tageswoche.curve;
 
-    function SoccerMap(container, width, height, settings) {
-      var self;
+    field = tageswoche.field;
+
+    data = tageswoche.data;
+
+    function SoccerMap(container, width, settings) {
+      var height, self;
       this.settings = settings != null ? settings : {};
       self = this;
+      field.scale = width / field.originalWidth;
+      height = width / field.widthHeightRelation;
       SoccerMap.__super__.constructor.call(this, container, width, height);
       this.scenes = [];
       this.red = "#EE402F";
@@ -33,7 +39,23 @@
           "stroke-linejoin": "round"
         }
       };
+      this.setup();
     }
+
+    SoccerMap.prototype.setup = function(container, width) {
+      var action, scene, _i, _len, _ref;
+      scene = data.nextScene();
+      _ref = scene.actions;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        action = _ref[_i];
+        action.start = field.calcPosition(action.start);
+        if (action.end) {
+          action.end = field.calcPosition(action.end);
+        }
+        this.addScene(action);
+      }
+      return this.draw();
+    };
 
     SoccerMap.prototype.addScene = function(scene) {
       return this.scenes.push(scene);

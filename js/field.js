@@ -4,45 +4,29 @@
   this.tageswoche = this.tageswoche || {};
 
   tageswoche.field = (function() {
-    var cellWidth, heights, originalWidth, widthHeightRelation;
-    originalWidth = 1152;
-    widthHeightRelation = 1152 / 760;
-    cellWidth = 64;
-    heights = [67, 67, 67, 67, 73, 80, 73, 67, 67, 67, 67];
     return {
+      originalWidth: 1152,
+      widthHeightRelation: 1152 / 760,
+      cellWidth: 64,
+      heights: [67, 67, 67, 67, 73, 80, 73, 67, 67, 67, 67],
       scale: 1,
-      setup: function(container, width) {
-        var height, map, scene, sceneArray, _i, _len;
-        this.scale = width / originalWidth;
-        height = width / widthHeightRelation;
-        map = new SoccerMap(container, width, height);
-        sceneArray = tageswoche.data.nextScene();
-        for (_i = 0, _len = sceneArray.length; _i < _len; _i++) {
-          scene = sceneArray[_i];
-          scene.start = this.calcPosition(scene.start);
-          if (scene.end) {
-            scene.end = this.calcPosition(scene.end);
-          }
-          map.addScene(scene);
-        }
-        return map.draw();
-      },
       calcPosition: function(position, mirror) {
-        var height, index, x, y, _i, _len;
+        var height, index, x, y, _i, _len, _ref;
         if (mirror == null) {
           mirror = false;
         }
         position = this.parsePosition(position, mirror);
-        x = (position.horizontal - 1) * cellWidth;
+        x = (position.horizontal - 1) * this.cellWidth;
         y = 0;
-        for (index = _i = 0, _len = heights.length; _i < _len; index = ++_i) {
-          height = heights[index];
+        _ref = this.heights;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          height = _ref[index];
           if ((index + 1) < position.vertical) {
             y += height;
           }
         }
-        x += cellWidth / 2;
-        y += heights[position.vertical - 1] / 2;
+        x += this.cellWidth / 2;
+        y += this.heights[position.vertical - 1] / 2;
         return {
           x: this.scale * x,
           y: this.scale * y

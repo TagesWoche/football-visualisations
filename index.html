@@ -28,8 +28,8 @@
   
   <script>
   $(document).ready(function() {
-    width = $("#spielszenen").width();
-    tageswoche.field.setup("spielszenen", width);
+    var width = $("#spielszenen").width();
+    var map = new SoccerMap("spielszenen", width);
   });
   </script>
   </body>

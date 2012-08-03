@@ -16,7 +16,7 @@
     };
     return {
       nextScene: function() {
-        return this.fetchScenes()[0].scenes;
+        return this.fetchScenes()[0];
       },
       fetchScenes: function() {
         return [
@@ -27,7 +27,7 @@
             oponent: "GC",
             home: true,
             tournament: "l",
-            scenes: [
+            actions: [
               {
                 name: "Stocker",
                 number: 5,

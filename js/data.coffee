@@ -12,7 +12,7 @@ tageswoche.data = do ->
     f:  "Foul"
   
   nextScene: () ->
-    @fetchScenes()[0].scenes
+    @fetchScenes()[0]
     
   fetchScenes: () ->
     [
@@ -23,7 +23,7 @@ tageswoche.data = do ->
         oponent: "GC"
         home: true
         tournament: "l"
-        scenes:
+        actions:
           [
             {
               name: "Stocker"
