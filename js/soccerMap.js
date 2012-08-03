@@ -43,18 +43,21 @@
     }
 
     SoccerMap.prototype.setup = function(container, width) {
-      var action, scene, _i, _len, _ref;
-      scene = data.nextScene();
-      _ref = scene.actions;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        action = _ref[_i];
-        action.start = field.calcPosition(action.start);
-        if (action.end) {
-          action.end = field.calcPosition(action.end);
+      var _this = this;
+      return data.loadScenes(function(error, scenes) {
+        var action, scene, _i, _len, _ref;
+        scene = data.nextScene();
+        _ref = scene.actions;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          action = _ref[_i];
+          action.start = field.calcPosition(action.start);
+          if (action.end) {
+            action.end = field.calcPosition(action.end);
+          }
+          _this.addScene(action);
         }
-        this.addScene(action);
-      }
-      return this.draw();
+        return _this.draw();
+      });
     };
 
     SoccerMap.prototype.addScene = function(scene) {

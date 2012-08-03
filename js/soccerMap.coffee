@@ -29,13 +29,14 @@ class @SoccerMap extends RaphaelMap
   # Setup
   setup: (container, width) ->
 
-    scene = data.nextScene()
-    for action in scene.actions
-      action.start = field.calcPosition(action.start)
-      action.end = field.calcPosition(action.end) if action.end
-      @addScene(action)
+    data.loadScenes (error, scenes) =>
+      scene = data.nextScene()
+      for action in scene.actions
+        action.start = field.calcPosition(action.start)
+        action.end = field.calcPosition(action.end) if action.end
+        @addScene(action)
 
-    @draw()
+      @draw()
           
   addScene: (scene) ->
     @scenes.push( scene ) 

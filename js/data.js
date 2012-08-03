@@ -15,11 +15,23 @@
       f: "Foul"
     };
     return {
+      scenes: void 0,
+      current: -1,
       nextScene: function() {
-        return this.fetchScenes()[0];
+        if (this.current < (this.scenes.length - 1)) {
+          this.current += 1;
+        }
+        return this.scenes[this.current];
       },
-      fetchScenes: function() {
-        return [
+      previousScene: function() {
+        if (this.current > 0) {
+          this.current -= 1;
+        }
+        return this.scenes[this.current];
+      },
+      loadScenes: function(callback) {
+        var data;
+        data = [
           {
             score: "2:1",
             minute: 85,
@@ -50,6 +62,8 @@
             ]
           }
         ];
+        this.scenes = data;
+        return callback(void 0, data);
       }
     };
   })();

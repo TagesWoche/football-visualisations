@@ -10,12 +10,20 @@ tageswoche.data = do ->
     ps: "Penaltyschiessen"
     ew: "Einwurf"
     f:  "Foul"
+
+  scenes: undefined
+  current: -1
   
   nextScene: () ->
-    @fetchScenes()[0]
+    @current += 1 if @current < ( @scenes.length - 1 )
+    @scenes[@current]
+  
+  previousScene: () ->
+    @current -= 1 if @current > 0
+    @scenes[@current]
     
-  fetchScenes: () ->
-    [
+  loadScenes: (callback) ->
+    data = [
       {
         score: "2:1"
         minute: 85
@@ -50,3 +58,7 @@ tageswoche.data = do ->
           ]
       }
     ]
+    
+    @scenes = data
+    callback(undefined, data)
+    
