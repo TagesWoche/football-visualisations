@@ -32,6 +32,26 @@
           y: this.scale * y
         };
       },
+      goalPosition: function() {
+        var height, index, position, x, y, _i, _len, _ref;
+        position = {
+          horizontal: 1,
+          vertical: 6
+        };
+        x = 15;
+        y = 5;
+        _ref = this.heights;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          height = _ref[index];
+          if ((index + 1) < position.vertical) {
+            y += height;
+          }
+        }
+        return {
+          x: this.scale * x,
+          y: this.scale * y
+        };
+      },
       parsePosition: function(position, mirror) {
         var charCode, horizontalPosition, letter, verticalPositon;
         if (mirror == null) {

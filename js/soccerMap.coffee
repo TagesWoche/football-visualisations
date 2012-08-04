@@ -10,7 +10,8 @@ class @SoccerMap extends RaphaelMap
     height = width / field.widthHeightRelation
     super(container, width, height)
     
-    @scenes = []
+    @scene = undefined
+    @actions = []
     
     @red = "#EE402F"
     @blue = "#0051A3"
@@ -24,51 +25,63 @@ class @SoccerMap extends RaphaelMap
         "stroke-width": 1.0
         "stroke-linejoin": "round"
         
-    @setup()
+    @nextScene()
   
-  # Setup
-  setup: (container, width) ->
-
+  nextScene: () ->
     data.loadScenes (error, scenes) =>
-      scene = data.nextScene()
-      for action in scene.actions
-        action.start = field.calcPosition(action.start)
-        action.end = field.calcPosition(action.end) if action.end
-        @addScene(action)
-
+      @scene = data.nextScene()
       @draw()
-          
-  addScene: (scene) ->
-    @scenes.push( scene ) 
+  
+  previousScene: () ->
+    data.loadScenes (error, scenes) =>
+      @scene = data.previousScene()
+      @draw()
   
   draw: ->
+    @actions = @scene.actions
+    
+    # prepare the positions
+    for action in @actions
+      action.start = field.calcPosition(action.start)
+      action.end = field.calcPosition(action.end) if action.end
+    
+    # draw visualization elements
+    @map.clear()
+    @updateInfo()
     @drawPasses()
     @drawPositions()
-      
+  
+  updateInfo: ->
+    $("#result .score").html(@scene.score)
+    
   drawPasses: ->
     lastPosition = undefined
-    for scene in @scenes
-      if scene.end
-        @drawSprint(scene.start, scene.end)
+    for action in @actions
+      if action.end
+        @drawSprint(action.start, action.end)
         
       if lastPosition
-        @addPass(lastPosition, scene.start)
+        @addPass(lastPosition, action.start)
         
-      lastPosition = if scene.end then scene.end else scene.start
+      lastPosition = if action.end then action.end else action.start
+    
+    # draw goal
+    if lastPosition
+      @drawGoal(lastPosition)
     
   drawPositions: ->
-    for scene in @scenes
+    for action in @actions
       startCircleRadius = @circleRadius
       drawStartLabel = true
       
-      if scene.end
-        @map.circle(scene.end.x, scene.end.y, @circleRadius).attr(@pathAttributes.default)
-        @label(scene.end, scene.number)
+      if action.end
+        @map.circle(action.end.x, action.end.y, @circleRadius).attr(@pathAttributes.default)
+        @label(action.end, action.number)
         startCircleRadius = startCircleRadius / 2
         drawStartLabel = false
         
-      @map.circle(scene.start.x, scene.start.y, startCircleRadius).attr(@pathAttributes.default)
-      @label(scene.start, scene.number) if drawStartLabel
+      @map.circle(action.start.x, action.start.y, startCircleRadius).attr(@pathAttributes.default)
+      @label(action.start, action.number) if drawStartLabel
   
   drawSprint: (start, end) ->
     # path = curve.line(start, end)
@@ -81,21 +94,30 @@ class @SoccerMap extends RaphaelMap
     endGap = 16
     length = Raphael.getTotalLength(path)
     subCurve = Raphael.getSubpath(path, startGap, (length - endGap) )
-    @drawArrow(path, (length - endGap))
+    @drawArrow(path, { length: (length - endGap) })
     
     @map.path(subCurve).attr({ fill:"", stroke: @white, "stroke-width": 2 })
     
-  
-  drawArrow: (path, endLength) ->
-    arrowSize = 10
+  drawGoal: (start) ->
+    end = field.goalPosition()
+    path = curve.curve(start, end, "10%", 0.6, "right")
+    @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })
+    @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": 3 })
+    
+  drawArrow: (path, { length, size, pointyness, strokeWidth, color }) ->
+    length ?= Raphael.getTotalLength(path)
+    size ?= 10
+    pointyness ?= 0.3
+    strokeWidth ?= 2
+    color ?= @white
     
     # only draw arrowhead if the length of the path is sufficient
-    if (endLength - arrowSize) > 30
-      base = Raphael.getPointAtLength(path, endLength - arrowSize)
-      tip = Raphael.getPointAtLength(path, endLength)
-      arrowhead = curve.arrow(base, tip, 0.3)
+    if (length - size) > 30
+      base = Raphael.getPointAtLength(path, length - size)
+      tip = Raphael.getPointAtLength(path, length)
+      arrowhead = curve.arrow(base, tip, pointyness)
       
-      @map.path(arrowhead).attr({ fill:"", stroke: @white, "stroke-width": 2 })
+      @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth })
       
     
   label: (position, label) ->

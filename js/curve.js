@@ -66,7 +66,7 @@
         }
         intermediatePoint = this.intermediatePoint(start, end, curvePosition);
         normVector = this.normVector(start, end);
-        angularVector = direction === "right" ? this.rotateVectorClockwise(normVector) : this.rotateVectorCounterClockwise(normVector);
+        angularVector = direction === "left" ? this.rotateVectorClockwise(normVector) : this.rotateVectorCounterClockwise(normVector);
         return this.add(intermediatePoint, this.multiply(angularVector, curvedness));
       },
       percent: function(percent) {

@@ -24,12 +24,26 @@
       <div id="spielszenen" class="clear">
       
       </div>
+      <div id="controls">
+        <a href="" id="prev-scene">prev</a>
+        <a href="" id="next-scene">next</a>
+      </div>
     </div>
   
   <script>
   $(document).ready(function() {
     var width = $("#spielszenen").width();
-    var map = new SoccerMap("spielszenen", width);
+    map = new SoccerMap("spielszenen", width);
+    
+    $("#next-scene").click(function(event) {
+      event.preventDefault();
+      map.nextScene();
+    });
+    
+    $("#prev-scene").click(function(event) {
+      event.preventDefault();
+      map.previousScene();
+    });
   });
   </script>
   </body>
