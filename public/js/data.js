@@ -30,63 +30,96 @@
         return this.scenes[this.current];
       },
       loadScenes: function(callback) {
+        var _this = this;
+        if (this.scenes) {
+          callback(void 0, this.scenes);
+          return;
+        }
+        $.ajax({
+          url: "http://tageswoche.jit.su/fcb/situations",
+          dataType: "jsonp"
+        }).done(function(data) {
+          var entry, newData;
+          data = data.list;
+          newData = (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = data.length; _i < _len; _i++) {
+              entry = data[_i];
+              _results.push({
+                actions: entry.playerPositions,
+                score: entry.score,
+                minute: entry.minute,
+                opponent: entry.opponent,
+                team: entry.team,
+                home: entry.homematch,
+                date: entry.date,
+                competition: entry.competition,
+                scorePosition: entry.scorePosition
+              });
+            }
+            return _results;
+          })();
+          _this.scenes = newData;
+          return callback(void 0, newData);
+        });
+      },
+      loadScenesFake: function(callback) {
         var data;
         data = [
           {
             score: "1:0",
             minute: 85,
             date: "01.06.2012",
-            oponent: "GC",
+            opponent: "GC",
             home: true,
             tournament: "l",
+            scorePosition: "OM",
             actions: [
               {
                 name: "Stocker",
                 number: 5,
-                start: "H1"
+                positions: ["H1"]
               }, {
                 name: "Park",
                 number: 8,
-                start: "E1",
-                end: "C10"
+                positions: ["E1", "C10"]
               }, {
                 name: "Streller",
                 number: 10,
-                start: "E9",
-                end: "A8"
+                positions: ["E9", "A8"]
               }, {
                 name: "D. Degen",
                 number: 7,
-                start: "C7"
+                positions: ["C7"]
               }
             ]
           }, {
             score: "2:0",
             minute: 86,
             date: "01.06.2012",
-            oponent: "GC",
+            opponent: "GC",
             home: true,
             tournament: "l",
+            scorePosition: "UL",
             actions: [
               {
                 name: "Frei",
                 number: 11,
-                start: "H4",
-                end: "F4"
+                positions: ["H4", "F4"]
               }, {
                 name: "Park",
                 number: 8,
-                start: "E6"
+                positions: ["E6"]
               }, {
                 name: "Frei",
                 number: 11,
-                start: "C5"
+                positions: ["C5"]
               }
             ]
           }
         ];
         this.scenes = data;
-        console.log(this.scenes);
         return callback(void 0, data);
       }
     };

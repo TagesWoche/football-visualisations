@@ -1,4 +1,4 @@
-### NATIONALRAT CLASS ###
+### SOCCERMAP CLASS ###
 class @SoccerMap extends RaphaelMap
   curve = tageswoche.curve
   field = tageswoche.field
@@ -20,7 +20,7 @@ class @SoccerMap extends RaphaelMap
     
     @pathAttributes =
       default:
-        fill: @red #E1E0DD #EFEFEA #c7c7c7
+        fill: @red
         stroke: ""
         "stroke-width": 1.0
         "stroke-linejoin": "round"
@@ -39,11 +39,14 @@ class @SoccerMap extends RaphaelMap
   
   draw: ->
     @actions = @scene.actions
+    console.log(@actions)
     
     # prepare the positions
     for action in @actions
-      action.start = field.calcPosition(action.start)
-      action.end = field.calcPosition(action.end) if action.end
+      first = action.positions[0]
+      last = if action.positions.length > 1 then action.positions[( action.positions.length - 1)] else undefined
+      action.start = field.calcPosition(first)
+      action.end = field.calcPosition(last) if last
     
     # draw visualization elements
     @map.clear()
@@ -76,12 +79,12 @@ class @SoccerMap extends RaphaelMap
       
       if action.end
         @map.circle(action.end.x, action.end.y, @circleRadius).attr(@pathAttributes.default)
-        @label(action.end, action.number)
+        # @label(action.end, action.number)
         startCircleRadius = startCircleRadius / 2
         drawStartLabel = false
         
       @map.circle(action.start.x, action.start.y, startCircleRadius).attr(@pathAttributes.default)
-      @label(action.start, action.number) if drawStartLabel
+      # @label(action.start, action.number) if drawStartLabel
   
   drawSprint: (start, end) ->
     # path = curve.line(start, end)
@@ -99,8 +102,10 @@ class @SoccerMap extends RaphaelMap
     @map.path(subCurve).attr({ fill:"", stroke: @white, "stroke-width": 2 })
     
   drawGoal: (start) ->
-    end = field.goalPosition()
-    path = curve.curve(start, end, "10%", 0.6, "right")
+    end = field.goalPosition( @scene.scorePosition.toLowerCase() )
+    foot = if start.y < end.y then "left" else "right"
+    
+    path = curve.curve(start, end, "10%", 0.6, foot)
     @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })
     @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": 3 })
     
@@ -112,7 +117,7 @@ class @SoccerMap extends RaphaelMap
     color ?= @white
     
     # only draw arrowhead if the length of the path is sufficient
-    if (length - size) > 30
+    if (length - size) > 5
       base = Raphael.getPointAtLength(path, length - size)
       tip = Raphael.getPointAtLength(path, length)
       arrowhead = curve.arrow(base, tip, pointyness)

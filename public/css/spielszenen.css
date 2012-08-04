@@ -6,7 +6,7 @@
 
 #spielszenen {
   background: green;
-  background: url(../img/fussballfeld-grid.jpg) no-repeat;
+  background: url(../img/fussballfeld.jpg) no-repeat;
   background-size: contain;
   padding: 2.9% 3%;
 }

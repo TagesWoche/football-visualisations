@@ -1,7 +1,16 @@
 @tageswoche = @tageswoche || {}
 
 tageswoche.field = do ->
-
+  
+  # y offset for each scorePosition when drawing the goal arrow
+  scorePosition : 
+    om: 40
+    um: 40
+    ol: 65
+    ul: 65
+    or: 15
+    ur: 15
+      
   # measurements from soccer field grid
   originalWidth: 1152
   widthHeightRelation: 1152 / 760
@@ -35,13 +44,13 @@ tageswoche.field = do ->
   
     { x: @scale * x, y: @scale * y }
 
-  goalPosition: () ->
+  goalPosition: ( scorePosition ) ->
     position = { horizontal: 1, vertical: 6 }
     
     # calculate x and y positions
-    x = 15
+    x = 20
   
-    y = 5
+    y = @scorePosition[scorePosition]
     for height, index in @heights when (index + 1) < position.vertical
       y += height
       

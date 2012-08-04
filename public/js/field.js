@@ -5,6 +5,14 @@
 
   tageswoche.field = (function() {
     return {
+      scorePosition: {
+        om: 40,
+        um: 40,
+        ol: 65,
+        ul: 65,
+        or: 15,
+        ur: 15
+      },
       originalWidth: 1152,
       widthHeightRelation: 1152 / 760,
       cellWidth: 64,
@@ -32,14 +40,14 @@
           y: this.scale * y
         };
       },
-      goalPosition: function() {
+      goalPosition: function(scorePosition) {
         var height, index, position, x, y, _i, _len, _ref;
         position = {
           horizontal: 1,
           vertical: 6
         };
-        x = 15;
-        y = 5;
+        x = 20;
+        y = this.scorePosition[scorePosition];
         _ref = this.heights;
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
           height = _ref[index];

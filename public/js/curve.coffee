@@ -44,7 +44,7 @@ tageswoche.curve = do ->
     
     intermediatePoint = @intermediatePoint(start, end, curvePosition)
     normVector = @normVector(start, end)
-    angularVector = if direction == "right"
+    angularVector = if direction == "left"
       @rotateVectorClockwise(normVector) 
     else 
       @rotateVectorCounterClockwise(normVector)
