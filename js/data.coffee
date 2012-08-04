@@ -28,10 +28,10 @@ tageswoche.data = do ->
         score: "2:1"
         minute: 85
         date: "01.06.2012"
-        oponent: "GC"
-        home: true
-        tournament: "l"
-        actions:
+        opponent: "GC"
+        homematch: true
+        competition: "l"
+        playerPositions:
           [
             {
               name: "Stocker"
