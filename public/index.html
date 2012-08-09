@@ -27,8 +27,13 @@
       
       </div>
       <div id="controls">
-        <a href="" id="prev-scene">prev</a>
-        <a href="" id="next-scene">next</a>
+        <a href="" id="prev-scene">vorherige</a>
+        <ul id="scene-list">
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+        <a href="" id="next-scene">nächste</a>
       </div>
     </div>
   
@@ -36,16 +41,6 @@
   $(document).ready(function() {
     var width = $("#spielszenen").width();
     map = new SoccerMap("spielszenen", width);
-    
-    $("#next-scene").click(function(event) {
-      event.preventDefault();
-      map.nextScene();
-    });
-    
-    $("#prev-scene").click(function(event) {
-      event.preventDefault();
-      map.previousScene();
-    });
   });
   </script>
   </body>

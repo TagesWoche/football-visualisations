@@ -26,6 +26,7 @@ tageswoche.field = do ->
   heights: [67, 67, 67, 67, 73, 80, 73, 67, 67, 67, 67]
 
   scale: 1
+  playDirection: "left"
     
   # get x, y values for a position. e.g "A1" -> { x: 32, y: 33.5 }
   calcPosition: (position, mirror = false) ->
@@ -48,7 +49,7 @@ tageswoche.field = do ->
     position = { horizontal: 1, vertical: 6 }
     
     # calculate x and y positions
-    x = 20
+    x = if @playDirection == "left" then 20 else (@originalWidth - 20)
   
     y = @scorePosition[scorePosition]
     for height, index in @heights when (index + 1) < position.vertical

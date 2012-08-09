@@ -44,6 +44,44 @@
   box-shadow: 1px, 1px, 4px, rgba(0, 0, 0, 0.5);
 }*/
 
+#controls {
+  text-align: center;
+  height: 35px;
+  line-height: 35px;
+  font-size: 15px;
+}
+
+#controls>a {
+/*  float: left;*/
+  text-decoration: none;
+  color: #000;
+}
+
+#scene-list {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+#scene-list li {
+  display: inline-block;
+/*  float: left;*/
+  padding: 0 5px;
+}
+
+#scene-list li a {
+  text-decoration: none;
+  color: #fff;
+  background: #888;
+  border-radius: 20px;
+  padding: 3px 5px 3px 8px;
+}
+
+#scene-list li a.active {
+  background: #444;
+}
+
+
 .clear {
   clear: both;
 }

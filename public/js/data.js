@@ -16,7 +16,13 @@
     };
     return {
       scenes: void 0,
+      games: {},
       current: -1,
+      addSceneToGame: function(scene, index) {
+        var game, _base, _name, _ref;
+        game = (_ref = (_base = this.games)[_name = scene.date]) != null ? _ref : _base[_name] = [];
+        return game.push(index);
+      },
       nextScene: function() {
         if (this.current < (this.scenes.length - 1)) {
           this.current += 1;
@@ -29,6 +35,10 @@
         }
         return this.scenes[this.current];
       },
+      getScene: function(index) {
+        this.current = index;
+        return this.scenes[this.current];
+      },
       loadScenes: function(callback) {
         var _this = this;
         if (this.scenes) {
@@ -39,13 +49,14 @@
           url: "http://tageswoche.jit.su/fcb/situations",
           dataType: "jsonp"
         }).done(function(data) {
-          var entry, newData;
+          var entry, index, newData;
           data = data.list;
           newData = (function() {
             var _i, _len, _results;
             _results = [];
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              entry = data[_i];
+            for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
+              entry = data[index];
+              this.addSceneToGame(entry, index);
               _results.push({
                 actions: entry.playerPositions,
                 score: entry.score,
@@ -59,19 +70,20 @@
               });
             }
             return _results;
-          })();
+          }).call(_this);
           _this.scenes = newData;
           return callback(void 0, newData);
         });
       },
       loadScenesFake: function(callback) {
-        var data;
+        var data, entry, index, newData;
         data = [
           {
             score: "1:0",
             minute: 85,
             date: "01.06.2012",
             opponent: "GC",
+            team: "FCB",
             home: true,
             tournament: "l",
             scorePosition: "OM",
@@ -99,6 +111,7 @@
             minute: 86,
             date: "01.06.2012",
             opponent: "GC",
+            team: "FCB",
             home: true,
             tournament: "l",
             scorePosition: "UL",
@@ -117,9 +130,43 @@
                 positions: ["C5"]
               }
             ]
+          }, {
+            score: "1:0",
+            minute: 14,
+            date: "01.07.2012",
+            opponent: "Servette",
+            team: "FCB",
+            home: true,
+            tournament: "l",
+            scorePosition: "UL",
+            actions: [
+              {
+                name: "Frei",
+                number: 11,
+                positions: ["H6"]
+              }, {
+                name: "Park",
+                number: 8,
+                positions: ["E5", "E4"]
+              }, {
+                name: "Frei",
+                number: 11,
+                positions: ["C3"]
+              }
+            ]
           }
         ];
         this.scenes = data;
+        this.games = {};
+        newData = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
+            entry = data[index];
+            _results.push(this.addSceneToGame(entry, index));
+          }
+          return _results;
+        }).call(this);
         return callback(void 0, data);
       }
     };

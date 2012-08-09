@@ -13,18 +13,21 @@ class @SoccerMap extends RaphaelMap
     @scene = undefined
     @actions = []
     
+    @black = "#555555"
     @red = "#EE402F"
     @blue = "#0051A3"
     @white = "#FFFFFF"
     @circleRadius = 13
+    @playerColor = @red
     
     @pathAttributes =
       default:
-        fill: @red
+        fill: @playerColor
         stroke: ""
         "stroke-width": 1.0
         "stroke-linejoin": "round"
-        
+    
+    @initEvents()  
     @nextScene()
   
   nextScene: () ->
@@ -37,9 +40,34 @@ class @SoccerMap extends RaphaelMap
       @scene = data.previousScene()
       @draw()
   
+  initEvents: () ->
+    $("#next-scene").click =>
+      event.preventDefault()
+      @nextScene()
+    
+    $("#prev-scene").click =>
+      event.preventDefault()
+      @previousScene()
+    
+    $("#scene-list").on "click", "a", (event) =>
+      event.preventDefault();
+      $this = $(event.target)
+      sceneIndex = $this.parent().data("sceneIndex")
+      scene = data.scenes[sceneIndex]
+      @scene = data.getScene(sceneIndex)
+      @draw()
+    
   draw: ->
+    if @scene.team.toLowerCase() == "fcb" 
+      field.playDirection = "left" 
+      @playerColor = @red
+      @pathAttributes.default.fill = @playerColor
+    else 
+      field.playDirection = "right"
+      @playerColor = @black
+      @pathAttributes.default.fill = @playerColor
+    
     @actions = @scene.actions
-    console.log(@actions)
     
     # prepare the positions
     for action in @actions
@@ -56,6 +84,16 @@ class @SoccerMap extends RaphaelMap
   
   updateInfo: ->
     $("#result .score").html(@scene.score)
+    $("#result .left").html("FCB")
+    $("#result .right").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    
+    game = data.games[@scene.date]
+    ul = $("#scene-list").html("")
+    for sceneIndex in game
+      scene = data.scenes[sceneIndex]
+      $gameLink = $("<li><a href='' class='#{ "active" if scene == @scene }'>#{ scene.minute }.</a></li>")
+      $gameLink.data("sceneIndex", sceneIndex)
+      ul.append($gameLink)
     
   drawPasses: ->
     lastPosition = undefined
@@ -79,17 +117,17 @@ class @SoccerMap extends RaphaelMap
       
       if action.end
         @map.circle(action.end.x, action.end.y, @circleRadius).attr(@pathAttributes.default)
-        # @label(action.end, action.number)
+        @label(action.end, action.number) if action.number
         startCircleRadius = startCircleRadius / 2
         drawStartLabel = false
         
       @map.circle(action.start.x, action.start.y, startCircleRadius).attr(@pathAttributes.default)
-      # @label(action.start, action.number) if drawStartLabel
+      @label(action.start, action.number) if drawStartLabel && action.number
   
   drawSprint: (start, end) ->
     # path = curve.line(start, end)
     path = curve.wavy(start, end, "10%")
-    @map.path(path).attr({ fill:"", stroke: @red, "stroke-width": 2 })
+    @map.path(path).attr({ fill:"", stroke: @playerColor, "stroke-width": 2 })
                
   addPass: (start, end) ->
     path = curve.curve(start, end, "10%", 0.6, "right")
@@ -104,6 +142,10 @@ class @SoccerMap extends RaphaelMap
   drawGoal: (start) ->
     end = field.goalPosition( @scene.scorePosition.toLowerCase() )
     foot = if start.y < end.y then "left" else "right"
+    
+    # reverse foot depending on playDirection
+    if field.playDirection == "right"
+      foot = if foot == "left" then "right" else "left"
     
     path = curve.curve(start, end, "10%", 0.6, foot)
     @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })

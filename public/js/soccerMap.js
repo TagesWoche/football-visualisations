@@ -28,18 +28,21 @@
       SoccerMap.__super__.constructor.call(this, container, width, height);
       this.scene = void 0;
       this.actions = [];
+      this.black = "#555555";
       this.red = "#EE402F";
       this.blue = "#0051A3";
       this.white = "#FFFFFF";
       this.circleRadius = 13;
+      this.playerColor = this.red;
       this.pathAttributes = {
         "default": {
-          fill: this.red,
+          fill: this.playerColor,
           stroke: "",
           "stroke-width": 1.0,
           "stroke-linejoin": "round"
         }
       };
+      this.initEvents();
       this.nextScene();
     }
 
@@ -59,10 +62,39 @@
       });
     };
 
+    SoccerMap.prototype.initEvents = function() {
+      var _this = this;
+      $("#next-scene").click(function() {
+        event.preventDefault();
+        return _this.nextScene();
+      });
+      $("#prev-scene").click(function() {
+        event.preventDefault();
+        return _this.previousScene();
+      });
+      return $("#scene-list").on("click", "a", function(event) {
+        var $this, scene, sceneIndex;
+        event.preventDefault();
+        $this = $(event.target);
+        sceneIndex = $this.parent().data("sceneIndex");
+        scene = data.scenes[sceneIndex];
+        _this.scene = data.getScene(sceneIndex);
+        return _this.draw();
+      });
+    };
+
     SoccerMap.prototype.draw = function() {
       var action, first, last, _i, _len, _ref;
+      if (this.scene.team.toLowerCase() === "fcb") {
+        field.playDirection = "left";
+        this.playerColor = this.red;
+        this.pathAttributes["default"].fill = this.playerColor;
+      } else {
+        field.playDirection = "right";
+        this.playerColor = this.black;
+        this.pathAttributes["default"].fill = this.playerColor;
+      }
       this.actions = this.scene.actions;
-      console.log(this.actions);
       _ref = this.actions;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         action = _ref[_i];
@@ -80,7 +112,23 @@
     };
 
     SoccerMap.prototype.updateInfo = function() {
-      return $("#result .score").html(this.scene.score);
+      var $gameLink, game, scene, sceneIndex, ul, _i, _len, _results;
+      $("#result .score").html(this.scene.score);
+      $("#result .left").html("FCB");
+      if (this.scene.opponent) {
+        $("#result .right").html(this.scene.opponent.toUpperCase());
+      }
+      game = data.games[this.scene.date];
+      ul = $("#scene-list").html("");
+      _results = [];
+      for (_i = 0, _len = game.length; _i < _len; _i++) {
+        sceneIndex = game[_i];
+        scene = data.scenes[sceneIndex];
+        $gameLink = $("<li><a href='' class='" + (scene === this.scene ? "active" : void 0) + "'>" + scene.minute + ".</a></li>");
+        $gameLink.data("sceneIndex", sceneIndex);
+        _results.push(ul.append($gameLink));
+      }
+      return _results;
     };
 
     SoccerMap.prototype.drawPasses = function() {
@@ -112,10 +160,18 @@
         drawStartLabel = true;
         if (action.end) {
           this.map.circle(action.end.x, action.end.y, this.circleRadius).attr(this.pathAttributes["default"]);
+          if (action.number) {
+            this.label(action.end, action.number);
+          }
           startCircleRadius = startCircleRadius / 2;
           drawStartLabel = false;
         }
-        _results.push(this.map.circle(action.start.x, action.start.y, startCircleRadius).attr(this.pathAttributes["default"]));
+        this.map.circle(action.start.x, action.start.y, startCircleRadius).attr(this.pathAttributes["default"]);
+        if (drawStartLabel && action.number) {
+          _results.push(this.label(action.start, action.number));
+        } else {
+          _results.push(void 0);
+        }
       }
       return _results;
     };
@@ -125,7 +181,7 @@
       path = curve.wavy(start, end, "10%");
       return this.map.path(path).attr({
         fill: "",
-        stroke: this.red,
+        stroke: this.playerColor,
         "stroke-width": 2
       });
     };
@@ -151,6 +207,9 @@
       var end, foot, path;
       end = field.goalPosition(this.scene.scorePosition.toLowerCase());
       foot = start.y < end.y ? "left" : "right";
+      if (field.playDirection === "right") {
+        foot = foot === "left" ? "right" : "left";
+      }
       path = curve.curve(start, end, "10%", 0.6, foot);
       this.drawArrow(path, {
         size: 10,

@@ -12,8 +12,13 @@ tageswoche.data = do ->
     f:  "Foul"
 
   scenes: undefined
+  games: {}
   current: -1
   
+  addSceneToGame: (scene, index) ->
+    game = @games[scene.date] ?= []
+    game.push(index)
+    
   nextScene: () ->
     @current += 1 if @current < ( @scenes.length - 1 )
     @scenes[@current]
@@ -22,6 +27,10 @@ tageswoche.data = do ->
     @current -= 1 if @current > 0
     @scenes[@current]
   
+  getScene: (index) ->
+    @current = index
+    @scenes[@current]
+    
   loadScenes: (callback) ->
     if @scenes
       callback(undefined, @scenes)
@@ -32,8 +41,9 @@ tageswoche.data = do ->
       dataType: "jsonp"
     ).done ( data ) =>
       data = data.list
+      newData = for entry, index in data
+        @addSceneToGame(entry, index)
         
-      newData = for entry in data
         {
           actions: entry.playerPositions
           score: entry.score
@@ -60,6 +70,7 @@ tageswoche.data = do ->
         minute: 85
         date: "01.06.2012"
         opponent: "GC"
+        team: "FCB"
         home: true
         tournament: "l"
         scorePosition: "OM"
@@ -91,6 +102,7 @@ tageswoche.data = do ->
         minute: 86
         date: "01.06.2012"
         opponent: "GC"
+        team: "FCB"
         home: true
         tournament: "l"
         scorePosition: "UL"
@@ -112,8 +124,40 @@ tageswoche.data = do ->
               positions: ["C5"]
             }
           ]
+      }, {
+        score: "1:0"
+        minute: 14
+        date: "01.07.2012"
+        opponent: "Servette"
+        team: "FCB"
+        home: true
+        tournament: "l"
+        scorePosition: "UL"
+        actions:
+          [
+            {
+              name: "Frei"
+              number: 11
+              positions: ["H6"]
+            },
+            {
+              name: "Park"
+              number: 8
+              positions: ["E5", "E4"]
+            },
+            {
+              name: "Frei"
+              number: 11
+              positions: ["C3"]
+            }
+          ]
       }
     ]
     @scenes = data
+    
+    @games = {}
+    newData = for entry, index in data
+      @addSceneToGame(entry, index)
+      
     callback(undefined, data)
     

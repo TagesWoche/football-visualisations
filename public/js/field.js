@@ -18,6 +18,7 @@
       cellWidth: 64,
       heights: [67, 67, 67, 67, 73, 80, 73, 67, 67, 67, 67],
       scale: 1,
+      playDirection: "left",
       calcPosition: function(position, mirror) {
         var height, index, x, y, _i, _len, _ref;
         if (mirror == null) {
@@ -46,7 +47,7 @@
           horizontal: 1,
           vertical: 6
         };
-        x = 20;
+        x = this.playDirection === "left" ? 20 : this.originalWidth - 20;
         y = this.scorePosition[scorePosition];
         _ref = this.heights;
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
