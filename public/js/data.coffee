@@ -30,6 +30,7 @@ tageswoche.data = do ->
   getScene: (index) ->
     @current = index
     @scenes[@current]
+      
     
   loadScenes: (callback) ->
     if @scenes

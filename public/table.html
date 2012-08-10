@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Tageswoche - Statistiken</title>
+    
+    <link href="css/spielszenen.css" rel="stylesheet">
+    
+    <script src="js/vendor/jquery-1.7.2.min.js"></script>
+    <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/underscore.js"></script>
+    <script src="js/tableData.js"></script>
+    <script src="js/templates.js"></script>
+  </head>
+  <body>
+    <h1>Statistics</h1>
+    <div id="stats"></div>
+    <script>
+    $(document).ready(function() {
+      var filter = {}
+      tageswoche.tableData.loadStatistics(filter, function(data) {
+        $("#stats").html(tageswoche.templates.table({ players : data.list }));
+        $(".gradesList").sparkline('html', {type: 'bar', barColor: 'red'}); 
+      });
+      
+    });
+    </script>
+  </body>
+</html>
