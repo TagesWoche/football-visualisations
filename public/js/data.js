@@ -6,34 +6,55 @@
   tageswoche.data = (function() {
     var specialConditions;
     specialConditions = {
-      fd: "Freistoss direkt",
-      fi: "Freistoss indirekt",
-      e: "Ecke",
-      p: "Penalty",
-      ps: "Penaltyschiessen",
-      ew: "Einwurf",
-      f: "Foul"
+      "Freistoss direkt": "fd",
+      "Freistoss indirekt": "fi",
+      "Ecke": "e",
+      "Penalty": "p",
+      "Penaltyschiessen": "ps",
+      "Einwurf": "ew",
+      "Foul": "f"
     };
     return {
+      is: function(condition, code) {
+        if (condition && code) {
+          return specialConditions[condition] === code.toLowerCase();
+        } else {
+          return false;
+        }
+      },
       scenes: void 0,
       games: {},
       current: -1,
-      addSceneToGame: function(scene, index) {
+      addSceneToGame: function(index, scene) {
         var game, _base, _name, _ref;
         game = (_ref = (_base = this.games)[_name = scene.date]) != null ? _ref : _base[_name] = [];
+        this.scenes.push(scene);
         return game.push(index);
       },
+      firstScene: function() {
+        var game, lastScene;
+        lastScene = this.scenes[this.scenes.length - 1];
+        game = this.games[lastScene.date];
+        this.current = game[0];
+        return this.scenes[this.current];
+      },
       nextScene: function() {
-        if (this.current < (this.scenes.length - 1)) {
+        if (!this.isLastScene()) {
           this.current += 1;
         }
         return this.scenes[this.current];
       },
+      isLastScene: function() {
+        return this.current === (this.scenes.length - 1);
+      },
       previousScene: function() {
-        if (this.current > 0) {
+        if (!this.isFirstScene()) {
           this.current -= 1;
         }
         return this.scenes[this.current];
+      },
+      isFirstScene: function() {
+        return this.current === 0;
       },
       getScene: function(index) {
         this.current = index;
@@ -46,18 +67,16 @@
           return;
         }
         $.ajax({
-          url: "http://tageswoche.jit.su/fcb/situations",
+          url: "http://tageswoche.herokuapp.com/fcb/situations",
           dataType: "jsonp"
         }).done(function(data) {
-          var entry, index, newData;
+          var entry, index, _i, _len;
           data = data.list;
-          newData = (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
-              entry = data[index];
-              this.addSceneToGame(entry, index);
-              _results.push({
+          _this.scenes = [];
+          for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
+            entry = data[index];
+            if (!/g:/i.test(entry.scorePosition)) {
+              _this.addSceneToGame(index, {
                 actions: entry.playerPositions,
                 score: entry.score,
                 minute: entry.minute,
@@ -69,10 +88,8 @@
                 scorePosition: entry.scorePosition
               });
             }
-            return _results;
-          }).call(_this);
-          _this.scenes = newData;
-          return callback(void 0, newData);
+          }
+          return callback(void 0, _this.scenes);
         });
       },
       loadScenesFake: function(callback) {

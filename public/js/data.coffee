@@ -3,29 +3,48 @@
 tageswoche.data = do ->
   
   specialConditions =
-    fd: "Freistoss direkt"
-    fi: "Freistoss indirekt"
-    e:  "Ecke"
-    p:  "Penalty"
-    ps: "Penaltyschiessen"
-    ew: "Einwurf"
-    f:  "Foul"
+    "Freistoss direkt": "fd"
+    "Freistoss indirekt": "fi"
+    "Ecke": "e"
+    "Penalty": "p"
+    "Penaltyschiessen": "ps"
+    "Einwurf": "ew"
+    "Foul": "f"
 
+  is: (condition, code) ->
+    if condition && code
+      specialConditions[condition] == code.toLowerCase()
+    else
+      false
+    
   scenes: undefined
   games: {}
   current: -1
   
-  addSceneToGame: (scene, index) ->
+  addSceneToGame: (index, scene) ->
     game = @games[scene.date] ?= []
+    @scenes.push(scene)
     game.push(index)
     
+  firstScene: () ->
+    lastScene = @scenes[@scenes.length - 1]
+    game = @games[lastScene.date]
+    @current = game[0]
+    @scenes[@current]
+    
   nextScene: () ->
-    @current += 1 if @current < ( @scenes.length - 1 )
+    @current += 1 if !@isLastScene()
     @scenes[@current]
   
+  isLastScene: () ->
+    @current == ( @scenes.length - 1 )
+  
   previousScene: () ->
-    @current -= 1 if @current > 0
+    @current -= 1 if !@isFirstScene()
     @scenes[@current]
+    
+  isFirstScene: () ->
+    @current == 0
   
   getScene: (index) ->
     @current = index
@@ -38,29 +57,29 @@ tageswoche.data = do ->
       return
     
     $.ajax(
-      url: "http://tageswoche.jit.su/fcb/situations",
+      url: "http://tageswoche.herokuapp.com/fcb/situations",
       dataType: "jsonp"
     ).done ( data ) =>
       data = data.list
-      newData = for entry, index in data
-        @addSceneToGame(entry, index)
+      
+      @scenes = []
+      for entry, index in data
         
-        {
-          actions: entry.playerPositions
-          score: entry.score
-          minute: entry.minute
-          opponent: entry.opponent
-          team: entry.team
-          home: entry.homematch
-          date: entry.date
-          competition: entry.competition
-          scorePosition: entry.scorePosition
-        }
+        # filter out gehaltene penaltys (z.B. "g:ur")
+        if !/g:/i.test(entry.scorePosition)        
+          @addSceneToGame(index,
+            actions: entry.playerPositions
+            score: entry.score
+            minute: entry.minute
+            opponent: entry.opponent
+            team: entry.team
+            home: entry.homematch
+            date: entry.date
+            competition: entry.competition
+            scorePosition: entry.scorePosition
+          )
       
-      # console.log( newData )
-      
-      @scenes = newData
-      callback(undefined, newData)
+      callback(undefined, @scenes)
       
     return
     

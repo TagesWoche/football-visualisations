@@ -1,10 +1,11 @@
 
-#container {
+/* SPIELSZENE */
+#scene-container {
   margin: 20px auto;
-  max-width: 600px;
+  max-width: 548px;
 }
 
-#spielszenen {
+#scenes {
   background: green;
   background: url(../img/fussballfeld.jpg) no-repeat;
   background-size: contain;
@@ -12,30 +13,30 @@
 }
 
 
-#result {
+#scene-result {
   margin: 3px 0;
   height: 30px;
 }
 
-#result span {
+#scene-result span {
   float: left;
   display: inline-box;
   line-height: 30px;
 }
 
-#result .left {
+#scene-result .left {
   width: 42%;
   text-align: right;
 }
 
-#result .score {
+#scene-result .score {
   width: 16%;
   font-size: 30px;
   letter-spacing: 4px;
   text-align: center;
 }
 
-#result .right {
+#scene-result .right {
   width: 42%;
 }
 
@@ -44,18 +45,29 @@
   box-shadow: 1px, 1px, 4px, rgba(0, 0, 0, 0.5);
 }*/
 
-#controls {
+#scene-controls {
   text-align: center;
   height: 35px;
   line-height: 35px;
   font-size: 15px;
+  background: #efefef; /*#A70B0C;*/
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
-#controls>a {
-/*  float: left;*/
+#prev-scene,
+#next-scene {
+  width: 100px;
+  padding: 0 10px;
   text-decoration: none;
   color: #000;
 }
+#prev-scene { float: left; text-align: left; }
+#next-scene { float: right; text-align: right; }
 
 #scene-list {
   display: inline-block;
@@ -72,15 +84,29 @@
 #scene-list li a {
   text-decoration: none;
   color: #fff;
-  background: #888;
-  border-radius: 20px;
+  background: #aaa;
   padding: 3px 5px 3px 8px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
 }
 
 #scene-list li a.active {
   background: #444;
 }
 
+#scene-desc {
+  font-size: 12px;
+}
+
+#scene-desc em {
+  font-style: normal;
+  padding-right: 10px;
+}
+
+#scene-desc span {
+  padding-right: 20px;
+}
 
 .clear {
   clear: both;
