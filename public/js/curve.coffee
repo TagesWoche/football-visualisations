@@ -83,7 +83,6 @@ tageswoche.curve = do ->
     
   slope: (start, end) ->
     delta = @delta(start, end)
-    
     delta.y / delta.x
     
   inverseSlope: (start, end) ->

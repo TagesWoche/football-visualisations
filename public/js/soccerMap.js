@@ -32,34 +32,56 @@
       this.red = "#EE402F";
       this.blue = "#0051A3";
       this.white = "#FFFFFF";
-      this.circleRadius = 13;
-      this.playerColor = this.red;
-      this.pathAttributes = {
-        "default": {
-          fill: this.playerColor,
-          stroke: "",
-          "stroke-width": 1.0,
-          "stroke-linejoin": "round"
-        }
+      this.fcbAttributes = {
+        fill: this.red,
+        stroke: "",
+        "stroke-width": 1.0,
+        "stroke-linejoin": "round"
       };
+      this.opponentAttributes = {
+        fill: this.black,
+        stroke: "",
+        "stroke-width": 1.0,
+        "stroke-linejoin": "round"
+      };
+      this.numberTextAttributes = {
+        fill: "#FFFFFF",
+        stroke: "none",
+        font: '200 13px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif'
+      };
+      this.circleRadius = 11;
+      this.playerColor = this.red;
+      this.playerAttributes = this.fcbAttributes;
       this.initEvents();
-      this.nextScene();
+      this.firstScene();
     }
 
-    SoccerMap.prototype.nextScene = function() {
+    SoccerMap.prototype.firstScene = function() {
       var _this = this;
       return data.loadScenes(function(error, scenes) {
-        _this.scene = data.nextScene();
+        _this.scene = data.firstScene();
         return _this.draw();
       });
     };
 
+    SoccerMap.prototype.nextScene = function() {
+      this.scene = data.nextScene();
+      if (data.isLastScene()) {
+        $("#next-scene").css("visibility", "hidden");
+      } else {
+        $("#prev-scene").css("visibility", "visible");
+      }
+      return this.draw();
+    };
+
     SoccerMap.prototype.previousScene = function() {
-      var _this = this;
-      return data.loadScenes(function(error, scenes) {
-        _this.scene = data.previousScene();
-        return _this.draw();
-      });
+      this.scene = data.previousScene();
+      if (data.isFirstScene()) {
+        $("#prev-scene").css("visibility", "hidden");
+      } else {
+        $("#next-scene").css("visibility", "visible");
+      }
+      return this.draw();
     };
 
     SoccerMap.prototype.initEvents = function() {
@@ -88,11 +110,11 @@
       if (this.scene.team.toLowerCase() === "fcb") {
         field.playDirection = "left";
         this.playerColor = this.red;
-        this.pathAttributes["default"].fill = this.playerColor;
+        this.playerAttributes = this.fcbAttributes;
       } else {
         field.playDirection = "right";
         this.playerColor = this.black;
-        this.pathAttributes["default"].fill = this.playerColor;
+        this.playerAttributes = this.opponentAttributes;
       }
       this.actions = this.scene.actions;
       _ref = this.actions;
@@ -106,17 +128,18 @@
         }
       }
       this.map.clear();
-      this.updateInfo();
       this.drawPasses();
-      return this.drawPositions();
+      this.drawPositions();
+      this.updateInfo();
+      return this.sceneInfo();
     };
 
     SoccerMap.prototype.updateInfo = function() {
       var $gameLink, game, scene, sceneIndex, ul, _i, _len, _results;
-      $("#result .score").html(this.scene.score);
-      $("#result .left").html("FCB");
+      $("#scene-result .score").html(this.scene.score);
+      $("#scene-result .left").html("FCB");
       if (this.scene.opponent) {
-        $("#result .right").html(this.scene.opponent.toUpperCase());
+        $("#scene-result .right").html(this.scene.opponent.toUpperCase());
       }
       game = data.games[this.scene.date];
       ul = $("#scene-list").html("");
@@ -131,6 +154,39 @@
       return _results;
     };
 
+    SoccerMap.prototype.extractSceneInfo = function() {
+      var assistAction, goalAction, length;
+      length = this.actions.length;
+      if (length) {
+        goalAction = this.actions[length - 1];
+        if (!data.is("Foul", goalAction.specialCondition)) {
+          this.scene.goal = goalAction.name;
+          if (data.is("Penalty", goalAction.specialCondition)) {
+            this.scene.goal = "" + this.scene.goal + " (Penalty)";
+          } else if (data.is("Freistoss direkt", goalAction.specialCondition)) {
+            this.scene.goal = "" + this.scene.goal + " (Freistoss direkt)";
+          } else if (data.is("Freistoss indirekt", goalAction.specialCondition)) {
+            this.scene.goal = "" + this.scene.goal + " (Freistoss indirekt)";
+          }
+          if (length > 1) {
+            assistAction = this.actions[length - 2];
+            if (!data.is("Foul", assistAction.specialCondition)) {
+              return this.scene.assist = assistAction.name;
+            }
+          }
+        }
+      }
+    };
+
+    SoccerMap.prototype.sceneInfo = function() {
+      var desc;
+      this.extractSceneInfo();
+      desc = $("#scene-desc").html("").append("<em>" + this.scene.team + " &ndash; " + this.scene.minute + ". Minute:</em>").append("<span>Tor: <strong>" + this.scene.goal + "</strong></span>");
+      if (this.scene.assist) {
+        return desc.append("<span>Assist: <strong>" + this.scene.assist + "</strong></span>");
+      }
+    };
+
     SoccerMap.prototype.drawPasses = function() {
       var action, lastPosition, _i, _len, _ref;
       lastPosition = void 0;
@@ -143,7 +199,11 @@
         if (lastPosition) {
           this.addPass(lastPosition, action.start);
         }
-        lastPosition = action.end ? action.end : action.start;
+        if (data.is("Foul", action.specialCondition)) {
+          lastPosition = void 0;
+        } else {
+          lastPosition = action.end ? action.end : action.start;
+        }
       }
       if (lastPosition) {
         return this.drawGoal(lastPosition);
@@ -151,24 +211,24 @@
     };
 
     SoccerMap.prototype.drawPositions = function() {
-      var action, drawStartLabel, startCircleRadius, _i, _len, _ref, _results;
+      var action, currentAttributes, player, start, _i, _len, _ref, _results;
       _ref = this.actions;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         action = _ref[_i];
-        startCircleRadius = this.circleRadius;
-        drawStartLabel = true;
+        currentAttributes = action.number ? this.fcbAttributes : this.playerAttributes;
         if (action.end) {
-          this.map.circle(action.end.x, action.end.y, this.circleRadius).attr(this.pathAttributes["default"]);
-          if (action.number) {
-            this.label(action.end, action.number);
-          }
-          startCircleRadius = startCircleRadius / 2;
-          drawStartLabel = false;
+          start = action.start;
+          player = action.end;
+        } else {
+          player = action.start;
         }
-        this.map.circle(action.start.x, action.start.y, startCircleRadius).attr(this.pathAttributes["default"]);
-        if (drawStartLabel && action.number) {
-          _results.push(this.label(action.start, action.number));
+        if (start) {
+          this.map.circle(start.x, start.y, this.circleRadius * 0.5).attr(currentAttributes);
+        }
+        this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
+        if (action.number) {
+          _results.push(this.label(player, action.number));
         } else {
           _results.push(void 0);
         }
@@ -254,18 +314,12 @@
     };
 
     SoccerMap.prototype.label = function(position, label) {
-      var color, font, x;
-      color = "#FFFFFF";
+      var x;
       x = position.x;
-      if (+label > 9) {
+      if (+label > 9 && +label < 20) {
         x -= 1;
       }
-      font = '200 16px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif';
-      return this.map.text(x, position.y, label).attr({
-        fill: color,
-        stroke: "none",
-        "font": font
-      });
+      return this.map.text(x, position.y, label).attr(this.numberTextAttributes);
     };
 
     return SoccerMap;

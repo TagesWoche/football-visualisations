@@ -17,30 +17,30 @@
     <script src="js/vendor/bootstrap-popover.js"></script>
   </head>
   <body>
-    <div id="container">
-      <div id="result">
-        <span class="left">FCB</span>
-        <span class="score">2:1</span>
-        <span class="right">GC</span>
+    <div id="scene-container">
+      <div id="scene-result">
+        <span class="left"></span>
+        <span class="score"></span>
+        <span class="right"></span>
       </div>
-      <div id="spielszenen" class="clear">
-      
-      </div>
-      <div id="controls">
-        <a href="" id="prev-scene">vorherige</a>
+      <div id="scene-controls">
+        <a href="" id="prev-scene">&laquo; vorherige</a>
         <ul id="scene-list">
           <li></li>
           <li></li>
           <li></li>
         </ul>
-        <a href="" id="next-scene">nächste</a>
+        <a href="" id="next-scene">nächste &raquo;</a>
       </div>
+      <div id="scenes" class="clear"></div>
+      <div id="scene-desc"></div>
+      
     </div>
   
   <script>
   $(document).ready(function() {
-    var width = $("#spielszenen").width();
-    map = new SoccerMap("spielszenen", width);
+    var width = $("#scenes").width();
+    map = new SoccerMap("scenes", width);
   });
   </script>
   </body>

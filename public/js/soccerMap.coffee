@@ -13,32 +13,53 @@ class @SoccerMap extends RaphaelMap
     @scene = undefined
     @actions = []
     
+    # Colors
     @black = "#555555"
     @red = "#EE402F"
     @blue = "#0051A3"
     @white = "#FFFFFF"
-    @circleRadius = 13
+    
+    # Attributes
+    @fcbAttributes =
+      fill: @red
+      stroke: ""
+      "stroke-width": 1.0
+      "stroke-linejoin": "round"
+      
+    @opponentAttributes =
+      fill: @black
+      stroke: ""
+      "stroke-width": 1.0
+      "stroke-linejoin": "round"
+    
+    @numberTextAttributes = 
+      fill: "#FFFFFF"
+      stroke: "none"
+      font: '200 13px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif'
+      
+    # other Settings
+    @circleRadius = 11
     @playerColor = @red
+    @playerAttributes = @fcbAttributes
     
-    @pathAttributes =
-      default:
-        fill: @playerColor
-        stroke: ""
-        "stroke-width": 1.0
-        "stroke-linejoin": "round"
-    
+    # initialize
     @initEvents()  
-    @nextScene()
-  
-  nextScene: () ->
+    @firstScene()
+
+  firstScene: () ->
     data.loadScenes (error, scenes) =>
-      @scene = data.nextScene()
+      @scene = data.firstScene()
       @draw()
+      
+  nextScene: () ->
+    @scene = data.nextScene()
+    if data.isLastScene() then $("#next-scene").css("visibility", "hidden") else $("#prev-scene").css("visibility", "visible")
+    @draw()
   
   previousScene: () ->
-    data.loadScenes (error, scenes) =>
-      @scene = data.previousScene()
-      @draw()
+    @scene = data.previousScene()
+    if data.isFirstScene() then $("#prev-scene").css("visibility", "hidden") else $("#next-scene").css("visibility", "visible")
+    @draw()
   
   initEvents: () ->
     $("#next-scene").click =>
@@ -61,11 +82,11 @@ class @SoccerMap extends RaphaelMap
     if @scene.team.toLowerCase() == "fcb" 
       field.playDirection = "left" 
       @playerColor = @red
-      @pathAttributes.default.fill = @playerColor
+      @playerAttributes = @fcbAttributes
     else 
       field.playDirection = "right"
       @playerColor = @black
-      @pathAttributes.default.fill = @playerColor
+      @playerAttributes = @opponentAttributes
     
     @actions = @scene.actions
     
@@ -78,14 +99,15 @@ class @SoccerMap extends RaphaelMap
     
     # draw visualization elements
     @map.clear()
-    @updateInfo()
     @drawPasses()
     @drawPositions()
+    @updateInfo()
+    @sceneInfo()
   
   updateInfo: ->
-    $("#result .score").html(@scene.score)
-    $("#result .left").html("FCB")
-    $("#result .right").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    $("#scene-result .score").html(@scene.score)
+    $("#scene-result .left").html("FCB")
+    $("#scene-result .right").html(@scene.opponent.toUpperCase()) if @scene.opponent
     
     game = data.games[@scene.date]
     ul = $("#scene-list").html("")
@@ -94,7 +116,35 @@ class @SoccerMap extends RaphaelMap
       $gameLink = $("<li><a href='' class='#{ "active" if scene == @scene }'>#{ scene.minute }.</a></li>")
       $gameLink.data("sceneIndex", sceneIndex)
       ul.append($gameLink)
+  
+  extractSceneInfo: ->
+    length = @actions.length
+    if length
+      goalAction = @actions[length - 1]
+      if !data.is("Foul", goalAction.specialCondition)
+        @scene.goal = goalAction.name
+        if data.is("Penalty", goalAction.specialCondition)
+          @scene.goal = "#{ @scene.goal } (Penalty)"
+        else if data.is("Freistoss direkt", goalAction.specialCondition)
+          @scene.goal = "#{ @scene.goal } (Freistoss direkt)"
+        else if data.is("Freistoss indirekt", goalAction.specialCondition)
+          @scene.goal = "#{ @scene.goal } (Freistoss indirekt)"
+        
+        if length > 1
+          assistAction = @actions[length - 2]
+          if !data.is("Foul", assistAction.specialCondition)
+            @scene.assist = assistAction.name
     
+  sceneInfo: ->
+    @extractSceneInfo()
+    
+    desc = $("#scene-desc").html("")
+    .append("<em>#{ @scene.team} &ndash; #{ @scene.minute}. Minute:</em>")
+    .append("<span>Tor: <strong>#{ @scene.goal }</strong></span>")
+    
+    if @scene.assist
+      desc.append("<span>Assist: <strong>#{ @scene.assist }</strong></span>")
+       
   drawPasses: ->
     lastPosition = undefined
     for action in @actions
@@ -103,26 +153,40 @@ class @SoccerMap extends RaphaelMap
         
       if lastPosition
         @addPass(lastPosition, action.start)
-        
-      lastPosition = if action.end then action.end else action.start
+      
+      if data.is("Foul", action.specialCondition)
+        # don't draw a pass from a foul position to the next one
+        lastPosition = undefined
+      else
+        lastPosition = if action.end then action.end else action.start
     
     # draw goal
     if lastPosition
       @drawGoal(lastPosition)
+      
     
   drawPositions: ->
     for action in @actions
-      startCircleRadius = @circleRadius
-      drawStartLabel = true
-      
-      if action.end
-        @map.circle(action.end.x, action.end.y, @circleRadius).attr(@pathAttributes.default)
-        @label(action.end, action.number) if action.number
-        startCircleRadius = startCircleRadius / 2
-        drawStartLabel = false
+
+      # hack: show all players with numbers as fcb Players 
+      # ...this only makes a difference in scenes of the opponent
+      currentAttributes = if action.number then @fcbAttributes else @playerAttributes
         
-      @map.circle(action.start.x, action.start.y, startCircleRadius).attr(@pathAttributes.default)
-      @label(action.start, action.number) if drawStartLabel && action.number
+      if action.end
+        start = action.start 
+        player = action.end
+      else
+        player = action.start
+        
+      # start position (optional)
+      if start
+        @map.circle( start.x, start.y, (@circleRadius * 0.5) ).attr(currentAttributes)
+        # @label(start, action.number) if action.number
+        
+      # player position
+      @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
+      @label(player, action.number) if action.number
+        
   
   drawSprint: (start, end) ->
     # path = curve.line(start, end)
@@ -168,13 +232,12 @@ class @SoccerMap extends RaphaelMap
       
     
   label: (position, label) ->
-    color = "#FFFFFF"
-
+    
+    # small text placement correction for 10 and upwards...
     x = position.x
-    if +label > 9
+    if +label > 9 && +label < 20
       x -= 1
       
-    font = '200 16px "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif';
-    @map.text(x, position.y, label).attr({fill: color, stroke: "none", "font": font})
+    @map.text(x, position.y, label).attr(@numberTextAttributes)
     
     
