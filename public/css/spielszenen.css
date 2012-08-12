@@ -1,4 +1,8 @@
 
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 /* SPIELSZENE */
 #scene-container {
   margin: 20px auto;
@@ -107,6 +111,23 @@
 #scene-desc span {
   padding-right: 20px;
 }
+
+/* TABLE */
+#table-container {
+  margin: 20px auto;
+  max-width: 648px;
+}
+
+#table-container thead {
+  /* font-family: Georgia, serif;*/
+  font-size: 12px;
+}
+
+#table-container tbody {
+  font-size: 12px;
+}
+
+/* UTILS */
 
 .clear {
   clear: both;

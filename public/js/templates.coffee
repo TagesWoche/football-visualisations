@@ -2,6 +2,15 @@
   table: _.template(
     """
     <table>
+      <colgroup>
+        <col class="col-player">
+        <col class="col-games" span="3">
+        <col class="col-goals" span="2">
+        <col class="col-yellow">
+        <col class="col-yellow-red">
+        <col class="col-red">
+        <col class="col-graph">
+      </colgroup>
       <thead>
         <tr>
           <td>Spieler</td>
