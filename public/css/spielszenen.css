@@ -122,19 +122,86 @@ body {
 #table-container {
   margin: 20px auto;
   max-width: 648px;
+  padding: 10px;
+  background: #f6f6f6;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
 }
 
-#table-container thead {
+#player-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#player-table thead {
   /* font-family: Georgia, serif;*/
   font-size: 12px;
+  font-weight: bold;
+  padding: 8px 4px;
 }
 
-#table-container tbody {
+#player-table thead th {
+  font-size: 11px;
+  padding: 6px 4px;
+  color: #333;
+  background: #f6f6f6;
+  border-bottom: 1px solid #666;
+  border-right: 1px solid #f6f6f6;
+  cursor: pointer;
+}
+
+#player-table thead th:hover {
+  font-size: 11px;
+  color: #fff;
+  background: #777;
+  font-weight: bold;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+#player-table tbody {
   font-size: 12px;
+}
+
+/* columns */
+#player-table .col-player { background: #f6f6f6; border-right: 1px solid #fff; }
+#player-table .col-games { background: #CCF0FF; border-right: 1px solid #A1C5D6; }
+#player-table .col-minutes { background: #CCF0FF; border-right: 1px solid #A1C5D6; }
+#player-table .col-grade { background: #CCF0FF; border-right: 1px solid #fff; }
+#player-table .col-goals { background: #E1EFD5; border-right: 1px solid #B5C5A8; } 
+#player-table .col-assists { background: #E1EFD5; border-right: 1px solid #fff; } 
+#player-table .col-yellow { background: #FFF2CC; border-right: 1px solid #E8DBAD; }
+#player-table .col-yellow-red { background: #FFF2CC; border-right: 1px solid #E8DBAD; } /* orange: FCE5CD */
+#player-table .col-red { background: #FFF2CC; border-right: 1px solid #fff; } /* red: F4CCCC */
+#player-table .col-graph { background: #f6f6f6; width: 300px; }
+
+#player-table td {
+  padding: 3px 4px;
+  color: #333;
+  border-bottom: 1px solid #ffffff;
+}
+
+#player-table td.graph {
+  padding: 0 8px;
+  vertical-align: bottom;
+  background: #f6f6f6;
+  border-bottom: 1px solid #ddd !important;
+}
+.center {
+  text-align: center;
 }
 
 /* UTILS */
-
+.loading {
+  color: #666;
+  padding: 0 0 20px;
+  font-size: 12px;
+}
 .clear {
   clear: both;
 }

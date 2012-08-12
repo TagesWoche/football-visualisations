@@ -1,43 +1,80 @@
+@tageswoche = @tageswoche || {}
+
 @tageswoche.templates = do ->
+  
   table: _.template(
     """
-    <table>
+    <table id="player-table">
       <colgroup>
         <col class="col-player">
-        <col class="col-games" span="3">
-        <col class="col-goals" span="2">
-        <col class="col-yellow">
-        <col class="col-yellow-red">
-        <col class="col-red">
-        <col class="col-graph">
+        <col class="col-games">
+        <col class="col-minutes">
+        <col class="col-grade">
+        <col class="col-goals">
+        <col class="col-assists">
+        <col class="col-yellow" align="center">
+        <col class="col-yellow-red" align="center">
+        <col class="col-red" align="center">
       </colgroup>
       <thead>
         <tr>
-          <td>Spieler</td>
-          <td>Einsätze</td>
-          <td>Minuten</td>
-          <td>Bewertung</td>
-          <td>Tore</td>
-          <td>Assists</td>
-          <td>Gelbe</td>
-          <td>Gelb-Rote</td>
-          <td>Rote</td>
-          <td>Bewertungs-Grafik</td>
+          <th>Spieler</th>
+          <th>Einsätze</th>
+          <th>Minuten</th>
+          <th>&oslash; Bewertung</th>
+          <th>Tore</th>
+          <th>Assists</th>
+          <th>Gelbe</th>
+          <th>Gelb-Rote</th>
+          <th>Rote</th>
         </tr>
       </thead>
       <tbody>
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
-            <td><%= player.played %></td>
-            <td><%= player.minutes %></td>
-            <td><%= Math.round(player.averageGrade*100)/100 %></td>
-            <td><%= player.goals %></td>
-            <td><%= player.assists %></td>
-            <td><%= player.yellowCards %></td>
-            <td><%= player.yellowRedCards %></td>
-            <td><%= player.redCards %></td>
-            <td class="gradesList bar">
+            <td class="center"><%= player.played %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    """
+  )
+  
+  tableGames: _.template(
+    """
+    <table id="player-table">
+      <colgroup>
+        <col class="col-player">
+        <col class="col-games">
+        <col class="col-minutes">
+        <col class="col-grade">
+        <col class="col-graph">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Spieler</th>
+          <th>Einsätze</th>
+          <th>Minuten</th>
+          <th>&oslash; Bewertung</th>
+          <th>Bewertungen aller Spiele</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% _.each(players, function(player) { %>
+          <tr>
+            <td><%= player.name %></td>
+            <td class="center"><%= player.played %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
+            <td class="gradesList bar graph">
               <% _.each(player.grades, function(grade){ %> 
                 <%= grade+"," %>
               <% }); %>  

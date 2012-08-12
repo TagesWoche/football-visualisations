@@ -4,8 +4,21 @@
   this.tageswoche = this.tageswoche || {};
 
   tageswoche.tableData = (function() {
+    var templates;
+    templates = tageswoche.templates;
     return {
       statistics: {},
+      filter: {},
+      data: {},
+      current: "top",
+      init: function() {
+        var _this = this;
+        return this.loadStatistics(this.filter, function(data) {
+          _this.data = data;
+          _this.initEvents();
+          return _this.showTopTable();
+        });
+      },
       loadStatistics: function(filter, callback) {
         var filterString,
           _this = this;
@@ -19,7 +32,6 @@
         if (filterString === "") {
           filterString = "all";
         }
-        console.log("Filter is " + filterString);
         if (this.statistics[filterString]) {
           callback(this.statistics[filterString]);
         } else {
@@ -27,11 +39,72 @@
             url: "http://tageswoche.herokuapp.com/fcb/statistics?" + filterString,
             dataType: "jsonp"
           }).done(function(data) {
-            console.log(data);
             _this.statistics[filterString] = data;
             return callback(data);
           });
         }
+      },
+      showTopTable: function() {
+        this.current = "top";
+        $("#stats").html(templates.table({
+          players: this.data.list
+        }));
+        return this.tablesorter();
+      },
+      showGamesTable: function() {
+        this.current = "games";
+        $("#stats").html(templates.tableGames({
+          players: this.data.list
+        }));
+        $(".gradesList").sparkline('html', {
+          type: 'bar',
+          height: 15,
+          barWidth: 12,
+          barSpacing: 2,
+          colorMap: {
+            "": '#F6F6F6',
+            "0": '#F6F6F6',
+            "0.01:1": '#E92431',
+            "1.01:2": '#EB4828',
+            "2.01:3": '#F9892E',
+            "3.01:4": '#EAE600',
+            "4.01:5": '#7FC249',
+            "5.01:6": '#1BA755'
+          }
+        });
+        return this.tablesorter();
+      },
+      tablesorter: function() {
+        return $("#player-table").tablesorter({
+          sortInitialOrder: "desc"
+        });
+      },
+      initEvents: function() {
+        var _this = this;
+        return $("#stats").on("click", "td", function(event) {
+          if ($(event.target).parent().parent("tbody").length) {
+            if (_this.current === "top") {
+              return _this.showGamesTable();
+            } else {
+              return _this.showTopTable();
+            }
+          }
+        });
+      },
+      aboveNull: function(value) {
+        var number;
+        number = +value;
+        if (number && number > 0) {
+          return number;
+        } else {
+          return "";
+        }
+      },
+      round: function(value) {
+        return Math.round(value * 10) / 10;
+      },
+      aboveNullRounded: function(value) {
+        return this.aboveNull(this.round(value));
       }
     };
   })();

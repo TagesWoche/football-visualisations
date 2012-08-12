@@ -9,23 +9,23 @@
     <script src="js/vendor/jquery-1.7.2.min.js"></script>
     <script src="js/vendor/sparklines.min.js"></script>
     <script src="js/vendor/underscore.js"></script>
-    <script src="js/tableData.js"></script>
     <script src="js/templates.js"></script>
+    <script src="js/tableData.js"></script>
+    <!-- <script src="js/vendor/jquery.tablesorter.js"></script>-->
+    <script src="js/vendor/jquery.tablesorter.js"></script>
   </head>
   <body>
     
     <div id="table-container">
-      <h1>Statistics</h1>
-      <div id="stats"></div>
+      <h1 style="margin:0 0 20px;">Spieler-Statistik</h1>
+      <div id="stats">
+        <div class="loading">loading...</div>
+      </div>
     </div>
+    
     <script>
     $(document).ready(function() {
-      var filter = {}
-      tageswoche.tableData.loadStatistics(filter, function(data) {
-        $("#stats").html(tageswoche.templates.table({ players : data.list }));
-        $(".gradesList").sparkline('html', {type: 'bar', barColor: 'red'}); 
-      });
-      
+      tageswoche.tableData.init();
     });
     </script>
   </body>
