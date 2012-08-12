@@ -115,6 +115,7 @@
                 cssDesc: "headerSortDown",
                 cssChildRow: "expand-child",
                 sortInitialOrder: "asc",
+                rememberSorting: true,
                 sortMultiSortKey: "shiftKey",
                 sortForce: null,
                 sortAppend: null,
@@ -388,7 +389,9 @@
 
                     this.column = header_index[this.parentNode.rowIndex + "-" + this.cellIndex];
                     // this.column = index;
-                    this.order = formatSortingOrder(table.config.sortInitialOrder);
+                    if (table.config.rememberSorting) {
+                      this.order = formatSortingOrder(table.config.sortInitialOrder);
+                    }
                     
 					
 					this.count = this.order;

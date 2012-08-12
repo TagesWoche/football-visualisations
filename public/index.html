@@ -8,7 +8,7 @@
     
     <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script> -->
 
-    
+    <!-- scenes -->
     <script src="js/vendor/jquery-1.7.2.min.js"></script>
     <script src="js/vendor/raphael-min.js"></script>
     <script src="js/field.js"></script>
@@ -16,11 +16,28 @@
     <script src="js/data.js"></script>
     <script src="js/raphaelMap.js"></script>
     <script src="js/soccerMap.js"></script>
-    
+
+    <!-- statistics -->
+    <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/underscore.js"></script>
+    <script src="js/vendor/jquery.tablesorter.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/tableData.js"></script>
+
     <!-- <script src="tageswoche-fussball.js"></script> -->
   </head>
   <body>
-    <div id="scene-container">
+    <div id="container">
+      
+      <!-- statistics -->
+      <div id="table-container">
+        <h1 style="margin:0 0 20px;">Spieler-Statistik</h1>
+        <div id="stats">
+          <div class="loading">loading...</div>
+        </div>
+      </div>
+      
+      <!-- scenes -->
       <div id="scene-result">
         <span class="left"></span>
         <span class="score"></span>
@@ -37,13 +54,16 @@
       </div>
       <div id="scenes" class="clear"></div>
       <div id="scene-desc"></div>
-      
     </div>
+    
+
+    
+    
   
   <script>
   jQuery(document).ready(function() {
-    var width = jQuery("#scenes").width();
-    map = new SoccerMap("scenes", width);
+    map = new SoccerMap("scenes");
+    tageswoche.tableData.init();
   });
   </script>
   </body>

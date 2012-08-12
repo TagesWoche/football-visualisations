@@ -4,9 +4,9 @@ body {
 }
 
 /* SPIELSZENE */
-#scene-container {
-  margin: 20px auto;
-  max-width: 548px;
+#container {
+  margin: 20px auto 40px;
+  max-width: 648px;
 }
 
 #scenes {
@@ -120,9 +120,8 @@ body {
 
 /* TABLE */
 #table-container {
-  margin: 20px auto;
-  max-width: 648px;
   padding: 10px;
+  margin-bottom: 40px;
   background: #f6f6f6;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;

@@ -19,6 +19,9 @@
           return _this.showTopTable();
         });
       },
+      getStatisticsForPopup: function() {
+        return this.statistics["all"];
+      },
       loadStatistics: function(filter, callback) {
         var filterString,
           _this = this;
@@ -76,7 +79,8 @@
       },
       tablesorter: function() {
         return $("#player-table").tablesorter({
-          sortInitialOrder: "desc"
+          sortInitialOrder: "desc",
+          rememberSorting: false
         });
       },
       initEvents: function() {

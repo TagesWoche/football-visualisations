@@ -12,8 +12,10 @@ tageswoche.tableData = do ->
       @data = data
       @initEvents()
       @showTopTable()
-      
-    
+
+  getStatisticsForPopup: ->
+    @statistics["all"]
+        
   loadStatistics: (filter, callback) ->
     filterString = ""
     if filter.location then filterString += "location=#{filter.location}&"
@@ -62,7 +64,10 @@ tageswoche.tableData = do ->
     @tablesorter()
     
   tablesorter: () ->
-    $("#player-table").tablesorter({ sortInitialOrder: "desc" })
+    $("#player-table").tablesorter(
+      sortInitialOrder: "desc"
+      rememberSorting: false
+    )
   
   initEvents: () ->
     $("#stats").on "click", "td", (event) =>
@@ -84,3 +89,5 @@ tageswoche.tableData = do ->
     
   aboveNullRounded: (value) ->
     @aboveNull( @round(value) )
+
+

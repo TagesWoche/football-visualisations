@@ -19,10 +19,11 @@
 
     data = tageswoche.data;
 
-    function SoccerMap(container, width, settings) {
-      var height, self;
+    function SoccerMap(container, settings) {
+      var height, self, width;
       this.settings = settings != null ? settings : {};
       self = this;
+      width = $("#scenes").width();
       field.scale = width / field.originalWidth;
       height = width / field.widthHeightRelation;
       SoccerMap.__super__.constructor.call(this, container, width, height);
@@ -131,7 +132,8 @@
       this.drawPasses();
       this.drawPositions();
       this.updateInfo();
-      return this.sceneInfo();
+      this.sceneInfo();
+      return this.setupPopups();
     };
 
     SoccerMap.prototype.updateInfo = function() {
@@ -187,6 +189,18 @@
       }
     };
 
+    SoccerMap.prototype.setupPopups = function() {
+      return $(".player").hover(function(event) {
+        var $this, playerStatistics, playerStats;
+        $this = $(this);
+        playerStatistics = tageswoche.tableData.getStatisticsForPopup();
+        playerStats = _.find(playerStatistics.list, function(player) {
+          return player.nickname === $this.attr("data-playername");
+        });
+        return console.log(playerStats);
+      });
+    };
+
     SoccerMap.prototype.drawPasses = function() {
       var action, lastPosition, _i, _len, _ref;
       lastPosition = void 0;
@@ -211,7 +225,7 @@
     };
 
     SoccerMap.prototype.drawPositions = function() {
-      var action, currentAttributes, player, start, _i, _len, _ref, _results;
+      var $circle, action, circle, currentAttributes, player, start, _i, _len, _ref, _results;
       _ref = this.actions;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -226,7 +240,10 @@
         if (start) {
           this.map.circle(start.x, start.y, this.circleRadius * 0.5).attr(currentAttributes);
         }
-        this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
+        circle = this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
+        $circle = jQuery(circle.node);
+        $circle.attr("data-playername", action.name);
+        $circle.attr("class", "player");
         if (action.number) {
           _results.push(this.label(player, action.number));
         } else {
