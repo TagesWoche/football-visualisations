@@ -22,3 +22,6 @@ tageswoche.tableData = do ->
           @statistics[filterString] = data
           callback(data)
         return
+      
+    getStatisticsForPopup: ->
+      @statistics["all"]

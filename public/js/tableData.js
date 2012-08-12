@@ -32,6 +32,9 @@
             return callback(data);
           });
         }
+      },
+      getStatisticsForPopup: function() {
+        return this.statistics["all"];
       }
     };
   })();

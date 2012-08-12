@@ -76,8 +76,8 @@ class @SoccerMap extends RaphaelMap
       sceneIndex = $this.parent().data("sceneIndex")
       scene = data.scenes[sceneIndex]
       @scene = data.getScene(sceneIndex)
-      @draw()
-    
+      @draw()      
+
   draw: ->
     if @scene.team.toLowerCase() == "fcb" 
       field.playDirection = "left" 
@@ -103,6 +103,8 @@ class @SoccerMap extends RaphaelMap
     @drawPositions()
     @updateInfo()
     @sceneInfo()
+
+    @setupPopups()
   
   updateInfo: ->
     $("#scene-result .score").html(@scene.score)
@@ -145,6 +147,18 @@ class @SoccerMap extends RaphaelMap
     if @scene.assist
       desc.append("<span>Assist: <strong>#{ @scene.assist }</strong></span>")
        
+  setupPopups: ->
+    $(".player").hover (event) ->
+      $this = $(@)
+      playerStatistics = tageswoche.tableData.getStatisticsForPopup()
+      playerStats = _.find(playerStatistics.list, (player) ->
+        #console.log(player.nickname)
+        #console.log($this.attr("data-playername"))
+        player.nickname == $this.attr("data-playername")
+      )
+      console.log(playerStats)
+      # TODO: draw the popup
+       
   drawPasses: ->
     lastPosition = undefined
     for action in @actions
@@ -184,7 +198,10 @@ class @SoccerMap extends RaphaelMap
         # @label(start, action.number) if action.number
         
       # player position
-      @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
+      circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
+      $circle = jQuery(circle.node)
+      $circle.attr("data-playername", action.name)
+      $circle.attr("class", "player")
       @label(player, action.number) if action.number
         
   
