@@ -6,14 +6,17 @@
     
     <link href="css/spielszenen.css" rel="stylesheet">
     
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+    
     <script src="js/vendor/jquery-1.7.2.min.js"></script>
     <script src="js/vendor/raphael-min.js"></script>
-    <script src="js/field.js"></script>
+    <!-- <script src="js/field.js"></script>
     <script src="js/curve.js"></script>
     <script src="js/data.js"></script>
     <script src="js/raphaelMap.js"></script>
-    <script src="js/soccerMap.js"></script>
-    <!-- <script src="tageswoche-fussball.js"></script> -->
+    <script src="js/soccerMap.js"></script> -->
+    <script src="tageswoche-fussball.js"></script>
   </head>
   <body>
     <div id="scene-container">
@@ -37,8 +40,8 @@
     </div>
   
   <script>
-  $(document).ready(function() {
-    var width = $("#scenes").width();
+  jQuery(document).ready(function() {
+    var width = jQuery("#scenes").width();
     map = new SoccerMap("scenes", width);
   });
   </script>
