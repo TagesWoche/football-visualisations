@@ -76,6 +76,27 @@ tageswoche.tableData = do ->
           @showGamesTable()
         else
           @showTopTable()
+  
+  totals: (players) ->
+    sum = { played: 0, minutes: 0, grades: [], goals: 0, assists: 0, yellowCards: 0, yellowRedCards: 0, redCards: 0 }
+    for player in players
+      sum.played += +player.played
+      sum.minutes += +player.minutes
+      if player.averageGrade > 0
+        sum.grades.push(player.averageGrade)
+      sum.goals += +player.goals
+      sum.assists += +player.assists
+      sum.yellowCards += +player.yellowCards
+      sum.yellowRedCards += +player.yellowRedCards
+      sum.redCards += +player.redCards
+    
+    console.log(sum.grades)
+    gradeSum = _.reduce(sum.grades, (sum, grade) ->
+      sum += grade
+    , 0)
+    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)
+    
+    sum
     
   aboveNull: (value) ->
     number = +value

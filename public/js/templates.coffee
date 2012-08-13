@@ -44,6 +44,20 @@
           </tr>
         <% }); %>
       </tbody>
+      <tbody style="font-weight:bold;text-align:center">
+        <tr>
+          <% sum = tageswoche.tableData.totals( players ) %>
+          <td>Total</td>
+          <td><%= sum.played %></td>
+          <td><%= sum.minutes %></td>
+          <td><%= sum.averageGrade %></td>
+          <td><%= sum.goals %></td>
+          <td><%= sum.assists %></td>
+          <td><%= sum.yellowCards %></td>
+          <td><%= sum.yellowRedCards %></td>
+          <td><%= sum.redCards %></td>
+        </tr>
+      </tbody>
     </table>
     """
   )
