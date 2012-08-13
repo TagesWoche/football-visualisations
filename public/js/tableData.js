@@ -96,7 +96,7 @@
         });
       },
       totals: function(players) {
-        var gradeSum, player, sum, _i, _len;
+        var count, gameGrade, gameGradeList, gameGradeSum, gameGrades, gradeSum, index, player, sum, _i, _j, _len, _len1, _ref;
         sum = {
           played: 0,
           minutes: 0,
@@ -105,8 +105,10 @@
           assists: 0,
           yellowCards: 0,
           yellowRedCards: 0,
-          redCards: 0
+          redCards: 0,
+          gameAverageGrades: []
         };
+        gameGrades = [];
         for (_i = 0, _len = players.length; _i < _len; _i++) {
           player = players[_i];
           sum.played += +player.played;
@@ -119,12 +121,38 @@
           sum.yellowCards += +player.yellowCards;
           sum.yellowRedCards += +player.yellowRedCards;
           sum.redCards += +player.redCards;
+          _ref = player.grades;
+          for (index in _ref) {
+            gameGrade = _ref[index];
+            if (gameGrades[index] === void 0) {
+              gameGrades[index] = [];
+            }
+            gameGrades[index].push(gameGrade);
+          }
         }
-        console.log(sum.grades);
         gradeSum = _.reduce(sum.grades, function(sum, grade) {
           return sum += grade;
         }, 0);
         sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length);
+        for (_j = 0, _len1 = gameGrades.length; _j < _len1; _j++) {
+          gameGradeList = gameGrades[_j];
+          count = 0;
+          gameGradeSum = _.reduce(gameGradeList, function(sum, grade) {
+            if (grade > 0) {
+              count += 1;
+              return sum += grade;
+            } else {
+              return sum;
+            }
+          }, 0);
+          console.log("sum is " + gameGradeSum + " and count is " + count);
+          if (count === 0) {
+            sum.gameAverageGrades.push(0);
+          } else {
+            sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count));
+          }
+        }
+        console.log(sum);
         return sum;
       },
       aboveNull: function(value) {

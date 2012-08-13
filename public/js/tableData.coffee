@@ -78,7 +78,8 @@ tageswoche.tableData = do ->
           @showTopTable()
   
   totals: (players) ->
-    sum = { played: 0, minutes: 0, grades: [], goals: 0, assists: 0, yellowCards: 0, yellowRedCards: 0, redCards: 0 }
+    sum = { played: 0, minutes: 0, grades: [], goals: 0, assists: 0, yellowCards: 0, yellowRedCards: 0, redCards: 0, gameAverageGrades: [] }
+    gameGrades = []
     for player in players
       sum.played += +player.played
       sum.minutes += +player.minutes
@@ -89,13 +90,34 @@ tageswoche.tableData = do ->
       sum.yellowCards += +player.yellowCards
       sum.yellowRedCards += +player.yellowRedCards
       sum.redCards += +player.redCards
+      for index, gameGrade of player.grades
+        if gameGrades[index] == undefined
+          gameGrades[index] = []
+        gameGrades[index].push(gameGrade)  
     
-    console.log(sum.grades)
+    # build the grade sum over all players    
     gradeSum = _.reduce(sum.grades, (sum, grade) ->
       sum += grade
     , 0)
-    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)
+    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)    
     
+    # build the average grade per game
+    for gameGradeList in gameGrades
+      count = 0
+      gameGradeSum = _.reduce(gameGradeList, (sum, grade) ->
+        if grade > 0
+          count += 1
+          sum += grade
+        else
+          sum
+      , 0)
+      console.log("sum is #{gameGradeSum} and count is #{count}")
+      if count == 0
+        sum.gameAverageGrades.push(0)
+      else
+        sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count))
+      
+    console.log(sum)
     sum
     
   aboveNull: (value) ->
