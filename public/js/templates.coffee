@@ -44,6 +44,31 @@
           </tr>
         <% }); %>
       </tbody>
+      <tbody style="font-weight:bold;text-align:center">
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <% sum = tageswoche.tableData.totals( players ) %>
+          <td>Total</td>
+          <td><%= sum.played %></td>
+          <td><%= sum.minutes %></td>
+          <td><%= sum.averageGrade %></td>
+          <td><%= sum.goals %></td>
+          <td><%= sum.assists %></td>
+          <td><%= sum.yellowCards %></td>
+          <td><%= sum.yellowRedCards %></td>
+          <td><%= sum.redCards %></td>
+        </tr>
+      </tbody>
     </table>
     """
   )
@@ -81,6 +106,27 @@
             </td>
           </tr>
         <% }); %>
+      </tbody>
+      <tbody style="font-weight:bold;text-align:center">
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <% sum = tageswoche.tableData.totals( players ) %>
+          <td>Total</td>
+          <td><%= sum.played %></td>
+          <td><%= sum.minutes %></td>
+          <td><%= sum.averageGrade %></td>
+          <td class="gradesList bar graph" style="text-align: left">
+            <% _.each(sum.gameAverageGrades, function(grade){ %> 
+              <%= grade+"," %>
+            <% }); %>
+          </td>
+        </tr>
       </tbody>
     </table>
     """
