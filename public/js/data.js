@@ -25,11 +25,11 @@
       scenes: void 0,
       games: {},
       current: -1,
-      addSceneToGame: function(index, scene) {
+      addSceneToGame: function(scene) {
         var game, _base, _name, _ref;
         game = (_ref = (_base = this.games)[_name = scene.date]) != null ? _ref : _base[_name] = [];
         this.scenes.push(scene);
-        return game.push(index);
+        return game.push(this.scenes.length - 1);
       },
       firstScene: function() {
         var game, lastScene;
@@ -70,13 +70,13 @@
           url: "http://tageswoche.herokuapp.com/fcb/situations",
           dataType: "jsonp"
         }).done(function(data) {
-          var entry, index, _i, _len;
+          var entry, _i, _len;
           data = data.list;
           _this.scenes = [];
-          for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
-            entry = data[index];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            entry = data[_i];
             if (!/g:/i.test(entry.scorePosition)) {
-              _this.addSceneToGame(index, {
+              _this.addSceneToGame({
                 actions: entry.playerPositions,
                 score: entry.score,
                 minute: entry.minute,
@@ -93,7 +93,7 @@
         });
       },
       loadScenesFake: function(callback) {
-        var data, entry, index, newData;
+        var data, entry, newData;
         data = [
           {
             score: "1:0",
@@ -178,9 +178,9 @@
         newData = (function() {
           var _i, _len, _results;
           _results = [];
-          for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
-            entry = data[index];
-            _results.push(this.addSceneToGame(entry, index));
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            entry = data[_i];
+            _results.push(this.addSceneToGame(entry));
           }
           return _results;
         }).call(this);

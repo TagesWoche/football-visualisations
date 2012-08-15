@@ -21,10 +21,10 @@ tageswoche.data = do ->
   games: {}
   current: -1
   
-  addSceneToGame: (index, scene) ->
+  addSceneToGame: (scene) ->
     game = @games[scene.date] ?= []
     @scenes.push(scene)
-    game.push(index)
+    game.push(@scenes.length - 1)
     
   firstScene: () ->
     lastScene = @scenes[@scenes.length - 1]
@@ -63,11 +63,11 @@ tageswoche.data = do ->
       data = data.list
       
       @scenes = []
-      for entry, index in data
+      for entry in data
         
         # filter out gehaltene penaltys (z.B. "g:ur")
-        if !/g:/i.test(entry.scorePosition)        
-          @addSceneToGame(index,
+        if !/g:/i.test(entry.scorePosition)      
+          @addSceneToGame(
             actions: entry.playerPositions
             score: entry.score
             minute: entry.minute
@@ -176,8 +176,8 @@ tageswoche.data = do ->
     @scenes = data
     
     @games = {}
-    newData = for entry, index in data
-      @addSceneToGame(entry, index)
+    newData = for entry in data
+      @addSceneToGame(entry)
       
     callback(undefined, data)
     

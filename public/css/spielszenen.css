@@ -71,7 +71,7 @@ body {
 
 #prev-scene,
 #next-scene {
-  width: 100px;
+  width: 80px;
   padding: 0 10px;
   text-decoration: none;
   color: #000;
@@ -145,7 +145,8 @@ body {
   padding: 6px 4px;
   color: #333;
   background: #f6f6f6;
-  border-bottom: 1px solid #666;
+  vertical-align: bottom;
+  border-bottom: 1px solid #ccc;
   border-right: 1px solid #f6f6f6;
   cursor: pointer;
 }
