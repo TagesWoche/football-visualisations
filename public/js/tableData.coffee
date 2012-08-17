@@ -44,7 +44,40 @@ tageswoche.tableData = do ->
   showGamesTable: () ->
     @current = "games"
     
+    
     $("#stats").html(templates.tableGames({ players : @data.list }))
+    
+    console.log(@data.list)
+    totalValues = _.map(@data.list[0].grades, (gradeEntry) -> 
+        tageswoche.tableData.round(gradeEntry.gameAverageGrade) )
+    gameNames =   _.map(@data.list[0].grades, (gradeEntry) -> 
+        gradeEntry.opponent )
+      
+    $("#totalGrades").sparkline(totalValues, {
+      type: 'bar'
+      #tooltipFormat: '{{value}} : {{value:games}}',
+      #tooltipPrefix: gameNames
+      # tooltipValueLookups: {
+      #   games: $.range_map( gameNames )
+      # }
+      #tooltipFormatFieldlist: gameNames
+      tooltipFormatter: (sparklines, options, fields) ->
+        #console.log(_.keys(fields))
+        "Gegner #{gameNames[fields[0].offset]}: #{totalValues[fields[0].offset]}"
+      height: 15
+      barWidth: 12
+      barSpacing: 2
+      colorMap:
+        "": '#F6F6F6'
+        "0": '#F6F6F6'
+        "0.01:1": '#E92431'
+        "1.01:2": '#EB4828'
+        "2.01:3": '#F9892E'
+        "3.01:4": '#EAE600'
+        "4.01:5": '#7FC249'
+        "5.01:6": '#1BA755'
+    })
+    
     $(".gradesList").sparkline('html', {
       type: 'bar'
       height: 15
@@ -59,6 +92,11 @@ tageswoche.tableData = do ->
         "3.01:4": '#EAE600'
         "4.01:5": '#7FC249'
         "5.01:6": '#1BA755'
+      tooltipFormatter: (sparklines, options, fields) ->
+        if fields[0].value == 0
+          "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+        else      
+          "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
         
     })
     @tablesorter()
@@ -100,24 +138,6 @@ tageswoche.tableData = do ->
       sum += grade
     , 0)
     sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)    
-    
-    # build the average grade per game
-    for gameGradeList in gameGrades
-      count = 0
-      gameGradeSum = _.reduce(gameGradeList, (sum, grade) ->
-        if grade > 0
-          count += 1
-          sum += grade
-        else
-          sum
-      , 0)
-      console.log("sum is #{gameGradeSum} and count is #{count}")
-      if count == 0
-        sum.gameAverageGrades.push(0)
-      else
-        sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count))
-      
-    console.log(sum)
     sum
     
   aboveNull: (value) ->

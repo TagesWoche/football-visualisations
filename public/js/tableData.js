@@ -55,10 +55,37 @@
         return this.tablesorter();
       },
       showGamesTable: function() {
+        var gameNames, totalValues;
         this.current = "games";
         $("#stats").html(templates.tableGames({
           players: this.data.list
         }));
+        console.log(this.data.list);
+        totalValues = _.map(this.data.list[0].grades, function(gradeEntry) {
+          return tageswoche.tableData.round(gradeEntry.gameAverageGrade);
+        });
+        gameNames = _.map(this.data.list[0].grades, function(gradeEntry) {
+          return gradeEntry.opponent;
+        });
+        $("#totalGrades").sparkline(totalValues, {
+          type: 'bar',
+          tooltipFormatter: function(sparklines, options, fields) {
+            return "Gegner " + gameNames[fields[0].offset] + ": " + totalValues[fields[0].offset];
+          },
+          height: 15,
+          barWidth: 12,
+          barSpacing: 2,
+          colorMap: {
+            "": '#F6F6F6',
+            "0": '#F6F6F6',
+            "0.01:1": '#E92431',
+            "1.01:2": '#EB4828',
+            "2.01:3": '#F9892E',
+            "3.01:4": '#EAE600',
+            "4.01:5": '#7FC249',
+            "5.01:6": '#1BA755'
+          }
+        });
         $(".gradesList").sparkline('html', {
           type: 'bar',
           height: 15,
@@ -73,6 +100,13 @@
             "3.01:4": '#EAE600',
             "4.01:5": '#7FC249',
             "5.01:6": '#1BA755'
+          },
+          tooltipFormatter: function(sparklines, options, fields) {
+            if (fields[0].value === 0) {
+              return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
+            } else {
+              return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+            }
           }
         });
         return this.tablesorter();
@@ -96,7 +130,7 @@
         });
       },
       totals: function(players) {
-        var count, gameGrade, gameGradeList, gameGradeSum, gameGrades, gradeSum, index, player, sum, _i, _j, _len, _len1, _ref;
+        var gameGrade, gameGrades, gradeSum, index, player, sum, _i, _len, _ref;
         sum = {
           played: 0,
           minutes: 0,
@@ -134,25 +168,6 @@
           return sum += grade;
         }, 0);
         sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length);
-        for (_j = 0, _len1 = gameGrades.length; _j < _len1; _j++) {
-          gameGradeList = gameGrades[_j];
-          count = 0;
-          gameGradeSum = _.reduce(gameGradeList, function(sum, grade) {
-            if (grade > 0) {
-              count += 1;
-              return sum += grade;
-            } else {
-              return sum;
-            }
-          }, 0);
-          console.log("sum is " + gameGradeSum + " and count is " + count);
-          if (count === 0) {
-            sum.gameAverageGrades.push(0);
-          } else {
-            sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count));
-          }
-        }
-        console.log(sum);
         return sum;
       },
       aboveNull: function(value) {

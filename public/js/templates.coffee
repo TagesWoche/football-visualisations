@@ -100,8 +100,8 @@
             <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
             <td class="gradesList bar graph">
-              <% _.each(player.grades, function(grade){ %> 
-                <%= grade+"," %>
+              <% _.each(player.grades, function(gradeEntry){ %> 
+                <%= gradeEntry.grade+"," %>
               <% }); %>  
             </td>
           </tr>
@@ -116,15 +116,11 @@
           <td></td>
         </tr>
         <tr>
-          <% sum = tageswoche.tableData.totals( players ) %>
           <td>Total</td>
           <td><%= sum.played %></td>
           <td><%= sum.minutes %></td>
           <td><%= sum.averageGrade %></td>
-          <td class="gradesList bar graph" style="text-align: left">
-            <% _.each(sum.gameAverageGrades, function(grade){ %> 
-              <%= grade+"," %>
-            <% }); %>
+          <td class="bar graph" id="totalGrades" style="text-align: left">
           </td>
         </tr>
       </tbody>
