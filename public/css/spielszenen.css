@@ -20,12 +20,19 @@ body {
 #scene-result {
   margin: 3px 0;
   height: 30px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-#scene-result span {
+#scene-result div {
   float: left;
   display: inline-box;
   line-height: 30px;
+  position: relative;
 }
 
 #scene-result .left {
@@ -71,13 +78,42 @@ body {
 
 #prev-scene,
 #next-scene {
-  width: 80px;
+  width: 95px;
   padding: 0 10px;
   text-decoration: none;
   color: #000;
 }
 #prev-scene { float: left; text-align: left; }
 #next-scene { float: right; text-align: right; }
+
+#prev-scene i,
+#next-scene i {
+  margin-top: 7px;
+  width: 20px;
+  height: 20px;
+  background: url(../img/sprite.png) no-repeat;
+}
+#prev-scene i { background-position: 0 0; float: left; margin-right: 5px; }
+#next-scene i { background-position: -75px 0; float: right; margin-left: 5px; }
+
+#prev-game,
+#next-game {
+  position: absolute;
+  top: 7px;
+  width: 20px;
+  height: 20px;
+  background: url(../img/sprite.png) no-repeat;
+}
+
+#prev-game {
+  left: 6px;
+  background-position: -25px 0;
+}
+
+#next-game {
+  right: 12px;
+  background-position: -50px 0;
+}
 
 #scene-list {
   display: inline-block;

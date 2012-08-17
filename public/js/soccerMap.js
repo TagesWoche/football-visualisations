@@ -67,22 +67,28 @@
 
     SoccerMap.prototype.nextScene = function() {
       this.scene = data.nextScene();
-      if (data.isLastScene()) {
-        $("#next-scene").css("visibility", "hidden");
-      } else {
-        $("#prev-scene").css("visibility", "visible");
-      }
       return this.draw();
     };
 
     SoccerMap.prototype.previousScene = function() {
       this.scene = data.previousScene();
-      if (data.isFirstScene()) {
-        $("#prev-scene").css("visibility", "hidden");
-      } else {
-        $("#next-scene").css("visibility", "visible");
-      }
       return this.draw();
+    };
+
+    SoccerMap.prototype.nextGame = function() {
+      var next;
+      if (next = data.nextGameScene()) {
+        this.scene = data.gotoScene(next.index);
+        return this.draw();
+      }
+    };
+
+    SoccerMap.prototype.previousGame = function() {
+      var prev;
+      if (prev = data.previousGameScene()) {
+        this.scene = data.gotoScene(prev.index);
+        return this.draw();
+      }
     };
 
     SoccerMap.prototype.initEvents = function() {
@@ -95,13 +101,21 @@
         event.preventDefault();
         return _this.previousScene();
       });
+      $("#prev-game").click(function() {
+        event.preventDefault();
+        return _this.previousGame();
+      });
+      $("#next-game").click(function() {
+        event.preventDefault();
+        return _this.nextGame();
+      });
       return $("#scene-list").on("click", "a", function(event) {
         var $this, scene, sceneIndex;
         event.preventDefault();
         $this = $(event.target);
         sceneIndex = $this.parent().data("sceneIndex");
         scene = data.scenes[sceneIndex];
-        _this.scene = data.getScene(sceneIndex);
+        _this.scene = data.gotoScene(sceneIndex);
         return _this.draw();
       });
     };
@@ -122,10 +136,14 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         action = _ref[_i];
         first = action.positions[0];
-        last = action.positions.length > 1 ? action.positions[action.positions.length - 1] : void 0;
+        last = action.positions[action.positions.length - 1];
+        if (action.positions.length > 1) {
+          action.running = true;
+        }
         action.start = field.calcPosition(first);
-        if (last) {
-          action.end = field.calcPosition(last);
+        action.end = action.running ? field.calcPosition(last) : action.start;
+        if (action.penalty) {
+          action.end = field.calcPenaltyPosition();
         }
       }
       this.map.clear();
@@ -139,9 +157,22 @@
     SoccerMap.prototype.updateInfo = function() {
       var $gameLink, game, scene, sceneIndex, ul, _i, _len, _results;
       $("#scene-result .score").html(this.scene.score);
-      $("#scene-result .left").html("FCB");
+      $("#scene-result .left span").html("FCB");
       if (this.scene.opponent) {
-        $("#scene-result .right").html(this.scene.opponent.toUpperCase());
+        $("#scene-result .right span").html(this.scene.opponent.toUpperCase());
+      }
+      $("#prev-scene, #next-scene, #prev-game, #next-game").css("visibility", "visible");
+      if (data.isLastScene()) {
+        $("#next-scene").css("visibility", "hidden");
+      }
+      if (data.isFirstScene()) {
+        $("#prev-scene").css("visibility", "hidden");
+      }
+      if (!data.nextGameScene()) {
+        $("#next-game").css("visibility", "hidden");
+      }
+      if (!data.previousGameScene()) {
+        $("#prev-game").css("visibility", "hidden");
       }
       game = data.games[this.scene.date];
       ul = $("#scene-list").html("");
@@ -161,18 +192,18 @@
       length = this.actions.length;
       if (length) {
         goalAction = this.actions[length - 1];
-        if (!data.is("Foul", goalAction.specialCondition)) {
+        if (!goalAction.foul) {
           this.scene.goal = goalAction.name;
-          if (data.is("Penalty", goalAction.specialCondition)) {
+          if (goalAction.penalty) {
             this.scene.goal = "" + this.scene.goal + " (Penalty)";
-          } else if (data.is("Freistoss direkt", goalAction.specialCondition)) {
+          } else if (goalAction.directFreeKick) {
             this.scene.goal = "" + this.scene.goal + " (Freistoss direkt)";
-          } else if (data.is("Freistoss indirekt", goalAction.specialCondition)) {
+          } else if (goalAction.indirectFreeKick) {
             this.scene.goal = "" + this.scene.goal + " (Freistoss indirekt)";
           }
           if (length > 1) {
             assistAction = this.actions[length - 2];
-            if (!data.is("Foul", assistAction.specialCondition)) {
+            if (!assistAction.foul && !assistAction.number) {
               return this.scene.assist = assistAction.name;
             }
           }
@@ -194,10 +225,9 @@
         var $this, playerStatistics, playerStats;
         $this = $(this);
         playerStatistics = tageswoche.tableData.getStatisticsForPopup();
-        playerStats = _.find(playerStatistics.list, function(player) {
+        return playerStats = _.find(playerStatistics.list, function(player) {
           return player.nickname === $this.attr("data-playername");
         });
-        return console.log(playerStats);
       });
     };
 
@@ -207,16 +237,16 @@
       _ref = this.actions;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         action = _ref[_i];
-        if (action.end) {
+        if (action.running) {
           this.drawSprint(action.start, action.end);
         }
         if (lastPosition) {
           this.addPass(lastPosition, action.start);
         }
-        if (data.is("Foul", action.specialCondition)) {
+        if (action.foul) {
           lastPosition = void 0;
         } else {
-          lastPosition = action.end ? action.end : action.start;
+          lastPosition = action.end;
         }
       }
       if (lastPosition) {
@@ -231,14 +261,15 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         action = _ref[_i];
         currentAttributes = action.number ? this.fcbAttributes : this.playerAttributes;
-        if (action.end) {
-          start = action.start;
-          player = action.end;
-        } else {
-          player = action.start;
-        }
-        if (start) {
+        start = action.start;
+        player = action.end;
+        if (action.running) {
           this.map.circle(start.x, start.y, this.circleRadius * 0.5).attr(currentAttributes);
+        }
+        if (action.penalty) {
+          currentAttributes = $.extend({}, currentAttributes, {
+            stroke: this.white
+          });
         }
         circle = this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
         $circle = jQuery(circle.node);

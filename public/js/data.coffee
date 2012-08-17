@@ -2,20 +2,15 @@
 
 tageswoche.data = do ->
   
-  specialConditions =
-    "Freistoss direkt": "fd"
-    "Freistoss indirekt": "fi"
-    "Ecke": "e"
-    "Penalty": "p"
-    "Penaltyschiessen": "ps"
-    "Einwurf": "ew"
-    "Foul": "f"
-
-  is: (condition, code) ->
-    if condition && code
-      specialConditions[condition] == code.toLowerCase()
-    else
-      false
+  # used to define attributes on every action with a special condition
+  specialConditionsAttr =
+    "fd": "directFreeKick" 
+    "fi": "indirectFreeKick"
+    "e" : "corner"
+    "p" : "penalty"
+    "ps": "penaltyShootout"
+    "ew": "throwIn"
+    "f" : "foul"
     
   scenes: undefined
   games: {}
@@ -47,10 +42,27 @@ tageswoche.data = do ->
     @current == 0
   
   getScene: (index) ->
-    @current = index
-    @scenes[@current]
-      
-    
+    if 0 <= index && index < @scenes.length
+      @scenes[index]
+  
+  gotoScene: (index) ->
+    if scene = @getScene(index)
+      @current = index
+      scene
+  
+  nextGameScene: () ->
+    game = @games[@scenes[@current].date]
+    lastScene = game[game.length - 1]
+    if nextScene = @getScene(lastScene + 1)
+      { scene: nextScene, index: lastScene + 1 }
+  
+  previousGameScene: () ->
+    game = @games[@scenes[@current].date]
+    firstScene = game[0]
+    if lastScenePrevGame = @getScene(firstScene - 1)
+      prevGame = @games[lastScenePrevGame.date]
+      { scene: @scenes[prevGame[0]], index: prevGame[0] }
+   
   loadScenes: (callback) ->
     if @scenes
       callback(undefined, @scenes)
@@ -66,7 +78,12 @@ tageswoche.data = do ->
       for entry in data
         
         # filter out gehaltene penaltys (z.B. "g:ur")
-        if !/g:/i.test(entry.scorePosition)      
+        if !/g:/i.test(entry.scorePosition)
+          
+          for action in entry.playerPositions
+            if action.specialCondition
+              action[ specialConditionsAttr[ action.specialCondition.toLowerCase() ] ] = true
+                 
           @addSceneToGame(
             actions: entry.playerPositions
             score: entry.score

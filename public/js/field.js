@@ -8,10 +8,10 @@
       scorePosition: {
         om: 40,
         um: 40,
-        ol: 65,
-        ul: 65,
-        or: 15,
-        ur: 15
+        ol: 68,
+        ul: 68,
+        or: 12,
+        ur: 12
       },
       originalWidth: 1152,
       widthHeightRelation: 1152 / 760,
@@ -41,14 +41,29 @@
           y: this.scale * y
         };
       },
+      calcPenaltyPosition: function() {
+        var correction, pos;
+        correction = this.scale * this.cellWidth / 2;
+        if (this.playDirection === "left") {
+          pos = this.calcPosition("C6");
+          pos.x = pos.x - correction;
+        } else {
+          pos = this.calcPosition("C6", true);
+          pos.x = pos.x + correction;
+        }
+        return pos;
+      },
       goalPosition: function(scorePosition) {
         var height, index, position, x, y, _i, _len, _ref;
         position = {
           horizontal: 1,
           vertical: 6
         };
-        x = this.playDirection === "left" ? 20 : this.originalWidth - 20;
+        x = this.playDirection === "left" ? 12 : this.originalWidth - 12;
         y = this.scorePosition[scorePosition];
+        if (this.playDirection === "right") {
+          y = 80 - y;
+        }
         _ref = this.heights;
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
           height = _ref[index];
@@ -62,15 +77,19 @@
         };
       },
       parsePosition: function(position, mirror) {
-        var charCode, horizontalPosition, letter, verticalPositon;
+        var charCode, horizontalPosition, letter, positionParts, verticalPositon;
         if (mirror == null) {
           mirror = false;
         }
-        position = position.trim();
-        letter = position.charAt(0);
+        position = position.replace(/\s/g, "");
+        positionParts = /^([a-r])([1-9][01]?)$/i.exec(position);
+        if (!positionParts && console) {
+          console.log("invalid position: " + position);
+        }
+        letter = positionParts[1];
         charCode = letter.toLowerCase().charCodeAt(0);
         horizontalPosition = charCode - 96;
-        verticalPositon = position.charAt(1);
+        verticalPositon = +positionParts[2];
         if (mirror) {
           return {
             horizontal: 19 - horizontalPosition,

@@ -6,10 +6,10 @@ tageswoche.field = do ->
   scorePosition : 
     om: 40
     um: 40
-    ol: 65
-    ul: 65
-    or: 15
-    ur: 15
+    ol: 68
+    ul: 68
+    or: 12
+    ur: 12
       
   # measurements from soccer field grid
   originalWidth: 1152
@@ -45,13 +45,29 @@ tageswoche.field = do ->
   
     { x: @scale * x, y: @scale * y }
 
+  calcPenaltyPosition: ->
+    correction = (@scale * @cellWidth / 2)
+    
+    if @playDirection == "left"
+      pos = @calcPosition("C6")
+      pos.x = pos.x - correction
+    else
+      pos = @calcPosition("C6", true)
+      pos.x = pos.x + correction
+      
+    pos
+    
   goalPosition: ( scorePosition ) ->
     position = { horizontal: 1, vertical: 6 }
     
     # calculate x and y positions
-    x = if @playDirection == "left" then 20 else (@originalWidth - 20)
+    x = if @playDirection == "left" then 12 else (@originalWidth - 12)
   
     y = @scorePosition[scorePosition]
+    
+    # reverse scorePosition if playing to the right
+    y = 80 - y if @playDirection == "right"
+    
     for height, index in @heights when (index + 1) < position.vertical
       y += height
       
@@ -60,13 +76,17 @@ tageswoche.field = do ->
   # transform "B3" in { horizontal: 2, vertical: 3 }
   # optionally mirror the position ("B3" -> "Q9" -> { horizontal: 17, vertical: 9})
   parsePosition: (position, mirror = false) ->
-    position = position.trim()
-    letter = position.charAt(0)
-
+    position = position.replace(/\s/g, "")
+    positionParts = /^([a-r])([1-9][01]?)$/i.exec(position)
+    
+    if !positionParts && console
+      console.log("invalid position: #{ position }")
+      
+    letter = positionParts[1]
     charCode = letter.toLowerCase().charCodeAt(0)
     horizontalPosition = charCode - 96
   
-    verticalPositon = position.charAt(1)
+    verticalPositon = +positionParts[2]
     
     if mirror
       { horizontal: 19 - horizontalPosition, vertical: 12 - verticalPositon }

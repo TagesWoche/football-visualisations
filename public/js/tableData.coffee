@@ -197,7 +197,7 @@ tageswoche.tableData = do ->
     gradeSum = _.reduce(sum.grades, (sum, grade) ->
       sum += grade
     , 0)
-    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)    
+    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)
     sum
     
   aboveNull: (value) ->

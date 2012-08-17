@@ -54,13 +54,21 @@ class @SoccerMap extends RaphaelMap
       
   nextScene: () ->
     @scene = data.nextScene()
-    if data.isLastScene() then $("#next-scene").css("visibility", "hidden") else $("#prev-scene").css("visibility", "visible")
     @draw()
   
   previousScene: () ->
     @scene = data.previousScene()
-    if data.isFirstScene() then $("#prev-scene").css("visibility", "hidden") else $("#next-scene").css("visibility", "visible")
     @draw()
+    
+  nextGame: () ->
+    if next = data.nextGameScene()
+      @scene = data.gotoScene(next.index)
+      @draw()
+  
+  previousGame: () ->
+    if prev = data.previousGameScene()
+      @scene = data.gotoScene(prev.index)
+      @draw()
   
   initEvents: () ->
     $("#next-scene").click =>
@@ -71,12 +79,20 @@ class @SoccerMap extends RaphaelMap
       event.preventDefault()
       @previousScene()
     
+    $("#prev-game").click =>
+      event.preventDefault()
+      @previousGame()
+        
+    $("#next-game").click =>
+      event.preventDefault()
+      @nextGame()
+        
     $("#scene-list").on "click", "a", (event) =>
       event.preventDefault();
       $this = $(event.target)
       sceneIndex = $this.parent().data("sceneIndex")
       scene = data.scenes[sceneIndex]
-      @scene = data.getScene(sceneIndex)
+      @scene = data.gotoScene(sceneIndex)
       @draw()      
 
   draw: ->
@@ -94,9 +110,16 @@ class @SoccerMap extends RaphaelMap
     # prepare the positions
     for action in @actions
       first = action.positions[0]
-      last = if action.positions.length > 1 then action.positions[( action.positions.length - 1)] else undefined
+      last = action.positions[( action.positions.length - 1)]
+      
+      if action.positions.length > 1
+        action.running = true
+        
       action.start = field.calcPosition(first)
-      action.end = field.calcPosition(last) if last
+      action.end = if action.running then field.calcPosition(last) else action.start
+        
+      if action.penalty
+        action.end = field.calcPenaltyPosition()
     
     # draw visualization elements
     @map.clear()
@@ -109,8 +132,15 @@ class @SoccerMap extends RaphaelMap
   
   updateInfo: ->
     $("#scene-result .score").html(@scene.score)
-    $("#scene-result .left").html("FCB")
-    $("#scene-result .right").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    $("#scene-result .left span").html("FCB")
+    $("#scene-result .right span").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    
+    # update navigation
+    $("#prev-scene, #next-scene, #prev-game, #next-game").css("visibility", "visible")
+    if data.isLastScene() then $("#next-scene").css("visibility", "hidden")
+    if data.isFirstScene() then $("#prev-scene").css("visibility", "hidden")
+    if !data.nextGameScene() then $("#next-game").css("visibility", "hidden")
+    if !data.previousGameScene() then $("#prev-game").css("visibility", "hidden")
     
     game = data.games[@scene.date]
     ul = $("#scene-list").html("")
@@ -124,18 +154,18 @@ class @SoccerMap extends RaphaelMap
     length = @actions.length
     if length
       goalAction = @actions[length - 1]
-      if !data.is("Foul", goalAction.specialCondition)
+      if !goalAction.foul
         @scene.goal = goalAction.name
-        if data.is("Penalty", goalAction.specialCondition)
+        if goalAction.penalty
           @scene.goal = "#{ @scene.goal } (Penalty)"
-        else if data.is("Freistoss direkt", goalAction.specialCondition)
+        else if goalAction.directFreeKick
           @scene.goal = "#{ @scene.goal } (Freistoss direkt)"
-        else if data.is("Freistoss indirekt", goalAction.specialCondition)
+        else if goalAction.indirectFreeKick
           @scene.goal = "#{ @scene.goal } (Freistoss indirekt)"
         
         if length > 1
           assistAction = @actions[length - 2]
-          if !data.is("Foul", assistAction.specialCondition)
+          if !assistAction.foul && !assistAction.number
             @scene.assist = assistAction.name
     
   sceneInfo: ->
@@ -153,27 +183,24 @@ class @SoccerMap extends RaphaelMap
       $this = $(@)
       playerStatistics = tageswoche.tableData.getStatisticsForPopup()
       playerStats = _.find(playerStatistics.list, (player) ->
-        #console.log(player.nickname)
-        #console.log($this.attr("data-playername"))
         player.nickname == $this.attr("data-playername")
       )
-      console.log(playerStats)
       # TODO: draw the popup
        
   drawPasses: ->
     lastPosition = undefined
     for action in @actions
-      if action.end
+      if action.running
         @drawSprint(action.start, action.end)
         
       if lastPosition
         @addPass(lastPosition, action.start)
       
-      if data.is("Foul", action.specialCondition)
+      if action.foul
         # don't draw a pass from a foul position to the next one
         lastPosition = undefined
       else
-        lastPosition = if action.end then action.end else action.start
+        lastPosition = action.end
     
     # draw goal
     if lastPosition
@@ -186,19 +213,19 @@ class @SoccerMap extends RaphaelMap
       # hack: show all players with numbers as fcb Players 
       # ...this only makes a difference in scenes of the opponent
       currentAttributes = if action.number then @fcbAttributes else @playerAttributes
+      
+      start = action.start 
+      player = action.end
         
-      if action.end
-        start = action.start 
-        player = action.end
-      else
-        player = action.start
-        
-      # start position (optional)
-      if start
+      # draw start position (only for running players)
+      if action.running
         @map.circle( start.x, start.y, (@circleRadius * 0.5) ).attr(currentAttributes)
         # @label(start, action.number) if action.number
         
       # player position
+      if action.penalty
+        currentAttributes = $.extend({}, currentAttributes, { stroke: @white })
+        
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
       $circle.attr("data-playername", action.name)
