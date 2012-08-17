@@ -55,6 +55,38 @@ tageswoche.tableData = do ->
     $("#stats").html(templates.table({ players : @data.list }))
     @tablesorter()
     
+  showScenesTable: () ->
+    @current = "scenes"
+    
+    $("#stats").html(templates.tableScenes({ players : @data.list }))  
+    _.each($(".scoresList"), (playerEntry, idx) =>
+      $playerEntry = $(playerEntry)
+      playerScores = _.chain(@data.list[idx].scores)
+                        .map((scoreEntry) ->
+                          scoreEntry.scores
+                        )
+                        .last(@limit)
+                        .value()
+                        
+      $playerEntry.sparkline(playerScores,
+        type: 'bar'
+        # tooltipFormatter: (sparklines, options, fields) ->
+        #          if fields[0].value == 0
+        #            "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+        #          else      
+        #            "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"    
+        height: 15
+        barWidth: 12
+        barSpacing: 2
+      
+      )
+      
+    )
+    
+    
+    
+    @tablesorter()
+    
   showGamesTable: () ->
     @current = "games"
         
@@ -126,28 +158,6 @@ tageswoche.tableData = do ->
       )
       
       )
-    
-    # $(".gradesList").sparkline('html', {
-    #   type: 'bar'
-    #   height: 15
-    #   barWidth: 12
-    #   barSpacing: 2
-    #   colorMap:
-    #     "": '#F6F6F6'
-    #     "0": '#F6F6F6'
-    #     "0.01:1": '#E92431'
-    #     "1.01:2": '#EB4828'
-    #     "2.01:3": '#F9892E'
-    #     "3.01:4": '#EAE600'
-    #     "4.01:5": '#7FC249'
-    #     "5.01:6": '#1BA755'
-    #   tooltipFormatter: (sparklines, options, fields) ->
-    #     if fields[0].value == 0
-    #       "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
-    #     else      
-    #       "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
-    #     
-    # })
     @tablesorter()
     
   tablesorter: () ->
@@ -160,7 +170,8 @@ tageswoche.tableData = do ->
     $("#stats").on "click", "td", (event) =>
       if $(event.target).parent().parent("tbody").length
         if @current == "top"
-          @showGamesTable()
+          #@showGamesTable()
+          @showScenesTable()
         else
           @showTopTable()
   
@@ -191,7 +202,7 @@ tageswoche.tableData = do ->
     
   aboveNull: (value) ->
     number = +value
-    if number && number > 0
+    if number && number > 0 && _.isFinite(number)
       number
     else
       ""

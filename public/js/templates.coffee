@@ -139,3 +139,67 @@
     """
   )
   
+  tableScenes: _.template(
+    """
+    <table id="player-table">
+      <colgroup>
+        <col class="col-player">
+        <col class="col-games">
+        <col class="col-goals">
+        <col class="col-assists">
+        <col class="col-scores">
+        <col class="col-scoresperminute">
+        <col class="col-graph">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Spieler</th>
+          <th>Einsätze</th>
+          <th>Tore</th>
+          <th>Assists</th>
+          <th>Scorerpunkte*</th>
+          <th>Minuten pro Scorerpunkt</th>
+          <th class="graph-column">Letzte Spiele</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% _.each(players, function(player) { %>
+          <tr>
+            <td><%= player.name %></td>
+            <td class="center"><%= player.played %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>
+            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>  
+            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>
+            <td class="scoresList bar graph graph-column"></td>
+          </tr>
+        <% }); %>
+      </tbody>
+      <tbody style="font-weight:bold;text-align:center">
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="graph-column"></td>
+        </tr>
+        <tr>
+          <% sum = tageswoche.tableData.totals( players ) %>
+          <td>Total</td>
+          <td><%= sum.played %></td>
+          <td><%= sum.goals %></td>
+          <td><%= sum.assists %></td>
+          <td><%= sum.goals + sum.assists %></td>
+          <td><%= tageswoche.tableData.aboveNullRounded(sum.minutes / (sum.goals + sum.assists)) %></td>
+          <td class="bar graph graph-column" id="totalScores" style="text-align: left">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <small class="legend">* Tore und Assists zusammengezählt</small>
+    """
+  )
+  
