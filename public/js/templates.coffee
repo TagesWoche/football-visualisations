@@ -89,7 +89,7 @@
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
-          <th>Bewertungen aller Spiele</th>
+          <th>Bewertung letzte Spiele</th>
         </tr>
       </thead>
       <tbody>

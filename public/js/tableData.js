@@ -13,10 +13,27 @@
       current: "top",
       init: function() {
         var _this = this;
-        return this.loadStatistics(this.filter, function(data) {
+        this.loadStatistics(this.filter, function(data) {
           _this.data = data;
           _this.initEvents();
           return _this.showTopTable();
+        });
+        _this = this;
+        return $("#location-filter").on("change", function(event) {
+          var $this;
+          $this = $(this);
+          _this.filter = {
+            location: $this.val()
+          };
+          return _this.loadStatistics(_this.filter, function(data) {
+            _this.data = data;
+            _this.initEvents();
+            if (_this.current === "top") {
+              return _this.showTopTable();
+            } else {
+              return _this.showGamesTable();
+            }
+          });
         });
       },
       getStatisticsForPopup: function() {

@@ -12,6 +12,20 @@ tageswoche.tableData = do ->
       @data = data
       @initEvents()
       @showTopTable()
+      
+    _this = @  
+    $("#location-filter").on "change", (event) ->
+      $this = $(@)
+      _this.filter = { location: $this.val() }
+      _this.loadStatistics _this.filter, (data) ->
+        _this.data = data
+        _this.initEvents()
+        if _this.current == "top"
+          _this.showTopTable()
+        else
+          _this.showGamesTable()
+          
+
 
   getStatisticsForPopup: ->
     @statistics["all"]
