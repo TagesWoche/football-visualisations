@@ -72,6 +72,27 @@
         }));
         return this.tablesorter();
       },
+      showScenesTable: function() {
+        var _this = this;
+        this.current = "scenes";
+        $("#stats").html(templates.tableScenes({
+          players: this.data.list
+        }));
+        _.each($(".scoresList"), function(playerEntry, idx) {
+          var $playerEntry, playerScores;
+          $playerEntry = $(playerEntry);
+          playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
+            return scoreEntry.scores;
+          }).last(_this.limit).value();
+          return $playerEntry.sparkline(playerScores, {
+            type: 'bar',
+            height: 15,
+            barWidth: 12,
+            barSpacing: 2
+          });
+        });
+        return this.tablesorter();
+      },
       showGamesTable: function() {
         var gameNames, totalValues,
           _this = this;
@@ -147,7 +168,7 @@
         return $("#stats").on("click", "td", function(event) {
           if ($(event.target).parent().parent("tbody").length) {
             if (_this.current === "top") {
-              return _this.showGamesTable();
+              return _this.showScenesTable();
             } else {
               return _this.showTopTable();
             }
@@ -198,7 +219,7 @@
       aboveNull: function(value) {
         var number;
         number = +value;
-        if (number && number > 0) {
+        if (number && number > 0 && _.isFinite(number)) {
           return number;
         } else {
           return "";

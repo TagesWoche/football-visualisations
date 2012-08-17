@@ -175,6 +175,8 @@ body {
 #player-table .col-grade { background: #CCF0FF; border-right: 1px solid #fff; }
 #player-table .col-goals { background: #E1EFD5; border-right: 1px solid #B5C5A8; } 
 #player-table .col-assists { background: #E1EFD5; border-right: 1px solid #fff; } 
+#player-table .col-scores { background: #E1EFD5; border-right: 1px solid #fff; } 
+#player-table .col-scoresperminute { background: #E1EFD5; border-right: 1px solid #fff; } 
 #player-table .col-yellow { background: #FFF2CC; border-right: 1px solid #E8DBAD; }
 #player-table .col-yellow-red { background: #FFF2CC; border-right: 1px solid #E8DBAD; } /* orange: FCE5CD */
 #player-table .col-red { background: #FFF2CC; border-right: 1px solid #fff; } /* red: F4CCCC */
