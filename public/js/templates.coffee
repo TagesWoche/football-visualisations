@@ -7,6 +7,7 @@
     <table id="player-table">
       <colgroup>
         <col class="col-player">
+        <col class="col-position">
         <col class="col-games">
         <col class="col-minutes">
         <col class="col-grade">
@@ -19,6 +20,7 @@
       <thead>
         <tr>
           <th>Spieler</th>
+          <th>Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
@@ -33,6 +35,7 @@
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
+            <td><%= player.position %></td>
             <td class="center"><%= player.played %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
@@ -55,10 +58,12 @@
           <td></td>
           <td></td>
           <td></td>
+          <td></td>
         </tr>
         <tr>
           <% sum = tageswoche.tableData.totals( players ) %>
           <td>Total</td>
+          <td></td>
           <td><%= sum.played %></td>
           <td><%= sum.minutes %></td>
           <td><%= sum.averageGrade %></td>
@@ -70,6 +75,8 @@
         </tr>
       </tbody>
     </table>
+    <br/>
+    <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
   
@@ -78,6 +85,7 @@
     <table id="player-table">
       <colgroup>
         <col class="col-player">
+        <col class="col-position">
         <col class="col-games">
         <col class="col-minutes">
         <col class="col-grade">
@@ -86,23 +94,22 @@
       <thead>
         <tr>
           <th>Spieler</th>
+          <th>Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
-          <th>Bewertungen aller Spiele</th>
+          <th class="graph-column">Bewertung letzte Spiele</th>
         </tr>
       </thead>
       <tbody>
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
+            <td><%= player.position %></td>
             <td class="center"><%= player.played %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
-            <td class="gradesList bar graph">
-              <% _.each(player.grades, function(grade){ %> 
-                <%= grade+"," %>
-              <% }); %>  
+            <td class="gradesList bar graph graph-column"> 
             </td>
           </tr>
         <% }); %>
@@ -114,21 +121,21 @@
           <td></td>
           <td></td>
           <td></td>
+          <td class="graph-column"></td>
         </tr>
         <tr>
-          <% sum = tageswoche.tableData.totals( players ) %>
           <td>Total</td>
+          <td></td>
           <td><%= sum.played %></td>
           <td><%= sum.minutes %></td>
           <td><%= sum.averageGrade %></td>
-          <td class="gradesList bar graph" style="text-align: left">
-            <% _.each(sum.gameAverageGrades, function(grade){ %> 
-              <%= grade+"," %>
-            <% }); %>
+          <td class="bar graph graph-column" id="totalGrades" style="text-align: left">
           </td>
         </tr>
       </tbody>
     </table>
+    <br/>
+    <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
   

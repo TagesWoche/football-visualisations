@@ -5,6 +5,7 @@ tageswoche.tableData = do ->
   statistics: {}
   filter: {}
   data: {}
+  limit: 14
   current: "top"
   
   init: () ->
@@ -12,6 +13,20 @@ tageswoche.tableData = do ->
       @data = data
       @initEvents()
       @showTopTable()
+      
+    _this = @  
+    $("#location-filter").on "change", (event) ->
+      $this = $(@)
+      _this.filter = { location: $this.val() }
+      _this.loadStatistics _this.filter, (data) ->
+        _this.data = data
+        _this.initEvents()
+        if _this.current == "top"
+          _this.showTopTable()
+        else
+          _this.showGamesTable()
+          
+
 
   getStatisticsForPopup: ->
     @statistics["all"]
@@ -36,17 +51,34 @@ tageswoche.tableData = do ->
       return
   
   showTopTable: () ->
-    @current = "top"
-    
+    @current = "top"   
     $("#stats").html(templates.table({ players : @data.list }))
     @tablesorter()
     
   showGamesTable: () ->
     @current = "games"
-    
+        
     $("#stats").html(templates.tableGames({ players : @data.list }))
-    $(".gradesList").sparkline('html', {
+
+    totalValues = _.chain(@data.list[0].grades)
+                    .map((gradeEntry) -> 
+                        tageswoche.tableData.round(gradeEntry.gameAverageGrade) 
+                    )
+                    .last(@limit)
+                    .value()
+        
+    gameNames =   _.chain(@data.list[0].grades)
+                    .map((gradeEntry) -> 
+                        gradeEntry.opponent 
+                    )
+                    .last(@limit)
+                    .value()
+                    
+      
+    $("#totalGrades").sparkline(totalValues, {
       type: 'bar'
+      tooltipFormatter: (sparklines, options, fields) ->
+        "Gegner #{gameNames[fields[0].offset]}: #{totalValues[fields[0].offset]}"
       height: 15
       barWidth: 12
       barSpacing: 2
@@ -59,8 +91,63 @@ tageswoche.tableData = do ->
         "3.01:4": '#EAE600'
         "4.01:5": '#7FC249'
         "5.01:6": '#1BA755'
-        
     })
+    
+    _.each($(".gradesList"), (playerEntry, idx) =>
+      $playerEntry = $(playerEntry)
+      playerValues = _.chain(@data.list[idx].grades)
+                        .map((gradeEntry) -> 
+                            tageswoche.tableData.round(gradeEntry.grade) 
+                        )
+                        .last(@limit)
+                        .value()
+      
+      $playerEntry.sparkline(playerValues,
+        type: 'bar'
+        tooltipFormatter: (sparklines, options, fields) ->
+          if fields[0].value == 0
+            "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+          else      
+            "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
+          
+        height: 15
+        barWidth: 12
+        barSpacing: 2
+        colorMap:
+          "": '#F6F6F6'
+          "0": '#F6F6F6'
+          "0.01:1": '#E92431'
+          "1.01:2": '#EB4828'
+          "2.01:3": '#F9892E'
+          "3.01:4": '#EAE600'
+          "4.01:5": '#7FC249'
+          "5.01:6": '#1BA755'
+      
+      )
+      
+      )
+    
+    # $(".gradesList").sparkline('html', {
+    #   type: 'bar'
+    #   height: 15
+    #   barWidth: 12
+    #   barSpacing: 2
+    #   colorMap:
+    #     "": '#F6F6F6'
+    #     "0": '#F6F6F6'
+    #     "0.01:1": '#E92431'
+    #     "1.01:2": '#EB4828'
+    #     "2.01:3": '#F9892E'
+    #     "3.01:4": '#EAE600'
+    #     "4.01:5": '#7FC249'
+    #     "5.01:6": '#1BA755'
+    #   tooltipFormatter: (sparklines, options, fields) ->
+    #     if fields[0].value == 0
+    #       "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+    #     else      
+    #       "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
+    #     
+    # })
     @tablesorter()
     
   tablesorter: () ->
@@ -99,23 +186,7 @@ tageswoche.tableData = do ->
     gradeSum = _.reduce(sum.grades, (sum, grade) ->
       sum += grade
     , 0)
-    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)    
-    
-    # build the average grade per game
-    for gameGradeList in gameGrades
-      count = 0
-      gameGradeSum = _.reduce(gameGradeList, (sum, grade) ->
-        if grade > 0
-          count += 1
-          sum += grade
-        else
-          sum
-      , 0)
-      if count == 0
-        sum.gameAverageGrades.push(0)
-      else
-        sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count))
-      
+    sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length)
     sum
     
   aboveNull: (value) ->

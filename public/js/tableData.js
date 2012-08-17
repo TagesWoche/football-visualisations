@@ -10,13 +10,31 @@
       statistics: {},
       filter: {},
       data: {},
+      limit: 14,
       current: "top",
       init: function() {
         var _this = this;
-        return this.loadStatistics(this.filter, function(data) {
+        this.loadStatistics(this.filter, function(data) {
           _this.data = data;
           _this.initEvents();
           return _this.showTopTable();
+        });
+        _this = this;
+        return $("#location-filter").on("change", function(event) {
+          var $this;
+          $this = $(this);
+          _this.filter = {
+            location: $this.val()
+          };
+          return _this.loadStatistics(_this.filter, function(data) {
+            _this.data = data;
+            _this.initEvents();
+            if (_this.current === "top") {
+              return _this.showTopTable();
+            } else {
+              return _this.showGamesTable();
+            }
+          });
         });
       },
       getStatisticsForPopup: function() {
@@ -55,12 +73,23 @@
         return this.tablesorter();
       },
       showGamesTable: function() {
+        var gameNames, totalValues,
+          _this = this;
         this.current = "games";
         $("#stats").html(templates.tableGames({
           players: this.data.list
         }));
-        $(".gradesList").sparkline('html', {
+        totalValues = _.chain(this.data.list[0].grades).map(function(gradeEntry) {
+          return tageswoche.tableData.round(gradeEntry.gameAverageGrade);
+        }).last(this.limit).value();
+        gameNames = _.chain(this.data.list[0].grades).map(function(gradeEntry) {
+          return gradeEntry.opponent;
+        }).last(this.limit).value();
+        $("#totalGrades").sparkline(totalValues, {
           type: 'bar',
+          tooltipFormatter: function(sparklines, options, fields) {
+            return "Gegner " + gameNames[fields[0].offset] + ": " + totalValues[fields[0].offset];
+          },
           height: 15,
           barWidth: 12,
           barSpacing: 2,
@@ -74,6 +103,36 @@
             "4.01:5": '#7FC249',
             "5.01:6": '#1BA755'
           }
+        });
+        _.each($(".gradesList"), function(playerEntry, idx) {
+          var $playerEntry, playerValues;
+          $playerEntry = $(playerEntry);
+          playerValues = _.chain(_this.data.list[idx].grades).map(function(gradeEntry) {
+            return tageswoche.tableData.round(gradeEntry.grade);
+          }).last(_this.limit).value();
+          return $playerEntry.sparkline(playerValues, {
+            type: 'bar',
+            tooltipFormatter: function(sparklines, options, fields) {
+              if (fields[0].value === 0) {
+                return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
+              } else {
+                return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+              }
+            },
+            height: 15,
+            barWidth: 12,
+            barSpacing: 2,
+            colorMap: {
+              "": '#F6F6F6',
+              "0": '#F6F6F6',
+              "0.01:1": '#E92431',
+              "1.01:2": '#EB4828',
+              "2.01:3": '#F9892E',
+              "3.01:4": '#EAE600',
+              "4.01:5": '#7FC249',
+              "5.01:6": '#1BA755'
+            }
+          });
         });
         return this.tablesorter();
       },
@@ -96,7 +155,7 @@
         });
       },
       totals: function(players) {
-        var count, gameGrade, gameGradeList, gameGradeSum, gameGrades, gradeSum, index, player, sum, _i, _j, _len, _len1, _ref;
+        var gameGrade, gameGrades, gradeSum, index, player, sum, _i, _len, _ref;
         sum = {
           played: 0,
           minutes: 0,
@@ -134,23 +193,6 @@
           return sum += grade;
         }, 0);
         sum.averageGrade = tageswoche.tableData.round(gradeSum / sum.grades.length);
-        for (_j = 0, _len1 = gameGrades.length; _j < _len1; _j++) {
-          gameGradeList = gameGrades[_j];
-          count = 0;
-          gameGradeSum = _.reduce(gameGradeList, function(sum, grade) {
-            if (grade > 0) {
-              count += 1;
-              return sum += grade;
-            } else {
-              return sum;
-            }
-          }, 0);
-          if (count === 0) {
-            sum.gameAverageGrades.push(0);
-          } else {
-            sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count));
-          }
-        }
         return sum;
       },
       aboveNull: function(value) {
