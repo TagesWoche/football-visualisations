@@ -83,8 +83,8 @@ tageswoche.data = do ->
           for action in entry.playerPositions
             if action.specialCondition
               action[ specialConditionsAttr[ action.specialCondition.toLowerCase() ] ] = true
-                 
-          @addSceneToGame(
+              
+          scene = 
             actions: entry.playerPositions
             score: entry.score
             minute: entry.minute
@@ -94,7 +94,16 @@ tageswoche.data = do ->
             date: entry.date
             competition: entry.competition
             scorePosition: entry.scorePosition
-          )
+            
+          if entry.scorePosition
+            scorePositionParts = /(g:)?([ou])([mlr])/i.exec(entry.scorePosition)
+            if scorePositionParts
+              if scorePositionParts[2].toLowerCase() == "o"
+                scene.highKick = true
+              else
+                scene.lowKick = true
+                
+          @addSceneToGame(scene)
       
       callback(undefined, @scenes)
       

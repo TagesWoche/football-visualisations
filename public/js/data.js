@@ -94,7 +94,7 @@
           url: "http://tageswoche.herokuapp.com/fcb/situations",
           dataType: "jsonp"
         }).done(function(data) {
-          var action, entry, _i, _j, _len, _len1, _ref;
+          var action, entry, scene, scorePositionParts, _i, _j, _len, _len1, _ref;
           data = data.list;
           _this.scenes = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {
@@ -107,7 +107,7 @@
                   action[specialConditionsAttr[action.specialCondition.toLowerCase()]] = true;
                 }
               }
-              _this.addSceneToGame({
+              scene = {
                 actions: entry.playerPositions,
                 score: entry.score,
                 minute: entry.minute,
@@ -117,7 +117,18 @@
                 date: entry.date,
                 competition: entry.competition,
                 scorePosition: entry.scorePosition
-              });
+              };
+              if (entry.scorePosition) {
+                scorePositionParts = /(g:)?([ou])([mlr])/i.exec(entry.scorePosition);
+                if (scorePositionParts) {
+                  if (scorePositionParts[2].toLowerCase() === "o") {
+                    scene.highKick = true;
+                  } else {
+                    scene.lowKick = true;
+                  }
+                }
+              }
+              _this.addSceneToGame(scene);
             }
           }
           return callback(void 0, _this.scenes);

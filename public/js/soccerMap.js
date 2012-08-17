@@ -33,6 +33,7 @@
       this.red = "#EE402F";
       this.blue = "#0051A3";
       this.white = "#FFFFFF";
+      this.darkGrey = "#333333";
       this.fcbAttributes = {
         fill: this.red,
         stroke: "",
@@ -53,6 +54,7 @@
       this.circleRadius = 11;
       this.playerColor = this.red;
       this.playerAttributes = this.fcbAttributes;
+      this.shadowOpacity = 0.5;
       this.initEvents();
       this.firstScene();
     }
@@ -208,7 +210,12 @@
           if (length > 1) {
             assistAction = this.actions[length - 2];
             if (!assistAction.foul && !this.otherTeamAction(assistAction)) {
-              return this.scene.assist = assistAction.name;
+              this.scene.assist = assistAction.name;
+              if (assistAction.directFreeKick) {
+                return this.scene.assist = "" + this.scene.assist + " (Freistoss direkt)";
+              } else if (assistAction.indirectFreeKick) {
+                return this.scene.assist = "" + this.scene.assist + " (Freistoss indirekt)";
+              }
             }
           }
         }
@@ -278,7 +285,7 @@
         if (action.running) {
           this.map.circle(start.x, start.y, this.circleRadius * 0.5).attr(currentAttributes);
         }
-        if (action.penalty) {
+        if (action.penalty || action.directFreeKick || action.indirectFreeKick) {
           currentAttributes = $.extend({}, currentAttributes, {
             stroke: this.white
           });
@@ -324,13 +331,34 @@
     };
 
     SoccerMap.prototype.drawGoal = function(start) {
-      var end, foot, path;
+      var end, endShadowX, endShadowY, foot, path, xCorrection, yCorrection;
       end = field.goalPosition(this.scene.scorePosition.toLowerCase());
       foot = start.y < end.y ? "left" : "right";
       if (field.playDirection === "right") {
         foot = foot === "left" ? "right" : "left";
       }
-      path = curve.curve(start, end, "10%", 0.6, foot);
+      xCorrection = field.playDirection === "right" ? -5 : 5;
+      yCorrection = this.scene.highKick ? 14 : 3;
+      endShadowX = end.x + (xCorrection * field.scale);
+      endShadowY = end.y + (yCorrection * field.scale);
+      path = curve.curve(start, {
+        x: endShadowX,
+        y: endShadowY
+      }, "8%", 0.6, foot);
+      this.drawArrow(path, {
+        size: 10,
+        pointyness: 0.3,
+        strokeWidth: 3,
+        color: this.darkGrey,
+        opacity: this.shadowOpacity
+      });
+      this.map.path(path).attr({
+        fill: "",
+        stroke: this.darkGrey,
+        "stroke-width": 3,
+        opacity: this.shadowOpacity
+      });
+      path = curve.curve(start, end, "8%", 0.6, foot);
       this.drawArrow(path, {
         size: 10,
         pointyness: 0.3,
@@ -344,8 +372,8 @@
     };
 
     SoccerMap.prototype.drawArrow = function(path, _arg) {
-      var arrowhead, base, color, length, pointyness, size, strokeWidth, tip;
-      length = _arg.length, size = _arg.size, pointyness = _arg.pointyness, strokeWidth = _arg.strokeWidth, color = _arg.color;
+      var arrowhead, base, color, length, opacity, pointyness, size, strokeWidth, tip;
+      length = _arg.length, size = _arg.size, pointyness = _arg.pointyness, strokeWidth = _arg.strokeWidth, color = _arg.color, opacity = _arg.opacity;
       if (length == null) {
         length = Raphael.getTotalLength(path);
       }
@@ -361,6 +389,9 @@
       if (color == null) {
         color = this.white;
       }
+      if (opacity == null) {
+        opacity = 1;
+      }
       if ((length - size) > 5) {
         base = Raphael.getPointAtLength(path, length - size);
         tip = Raphael.getPointAtLength(path, length);
@@ -368,7 +399,8 @@
         return this.map.path(arrowhead).attr({
           fill: "",
           stroke: color,
-          "stroke-width": strokeWidth
+          "stroke-width": strokeWidth,
+          opacity: opacity
         });
       }
     };

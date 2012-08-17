@@ -19,6 +19,7 @@ class @SoccerMap extends RaphaelMap
     @red = "#EE402F"
     @blue = "#0051A3"
     @white = "#FFFFFF"
+    @darkGrey = "#333333"
     
     # Attributes
     @fcbAttributes =
@@ -42,6 +43,7 @@ class @SoccerMap extends RaphaelMap
     @circleRadius = 11
     @playerColor = @red
     @playerAttributes = @fcbAttributes
+    @shadowOpacity = 0.5
     
     # initialize
     @initEvents()  
@@ -171,6 +173,10 @@ class @SoccerMap extends RaphaelMap
           assistAction = @actions[length - 2]
           if !assistAction.foul && !@otherTeamAction(assistAction)
             @scene.assist = assistAction.name
+            if assistAction.directFreeKick
+              @scene.assist = "#{ @scene.assist } (Freistoss direkt)"
+            else if assistAction.indirectFreeKick
+              @scene.assist = "#{ @scene.assist } (Freistoss indirekt)"
   
   # determine if the action is from a player from the opposing team
   # if an action has a player number its an fcb action
@@ -234,10 +240,11 @@ class @SoccerMap extends RaphaelMap
         @map.circle( start.x, start.y, (@circleRadius * 0.5) ).attr(currentAttributes)
         # @label(start, action.number) if action.number
         
-      # player position
-      if action.penalty
+      # mark standards
+      if action.penalty || action.directFreeKick || action.indirectFreeKick
         currentAttributes = $.extend({}, currentAttributes, { stroke: @white })
-        
+      
+      # player position
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
       $circle.attr("data-playername", action.name)
@@ -264,20 +271,32 @@ class @SoccerMap extends RaphaelMap
     end = field.goalPosition( @scene.scorePosition.toLowerCase() )
     foot = if start.y < end.y then "left" else "right"
     
-    # reverse foot depending on playDirection
+    # reverse foot depending on playDirection (so the ball flies towards the goal which looks more natural)
     if field.playDirection == "right"
       foot = if foot == "left" then "right" else "left"
     
-    path = curve.curve(start, end, "10%", 0.6, foot)
+    # shadow (to discern high and low kicks)
+    xCorrection = if field.playDirection == "right" then -5 else 5
+    yCorrection = if @scene.highKick then 14 else 3
+    endShadowX = end.x + (xCorrection * field.scale)
+    endShadowY = end.y + (yCorrection * field.scale)
+    path = curve.curve(start, { x: endShadowX, y: endShadowY }, "8%", 0.6, foot)
+    @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3, color: @darkGrey, opacity: @shadowOpacity })
+    @map.path(path).attr({ fill:"", stroke:  @darkGrey, "stroke-width": 3, opacity: @shadowOpacity })
+    
+    # shoot
+    path = curve.curve(start, end, "8%", 0.6, foot)
     @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })
     @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": 3 })
     
-  drawArrow: (path, { length, size, pointyness, strokeWidth, color }) ->
+
+  drawArrow: (path, { length, size, pointyness, strokeWidth, color, opacity }) ->
     length ?= Raphael.getTotalLength(path)
     size ?= 10
     pointyness ?= 0.3
     strokeWidth ?= 2
     color ?= @white
+    opacity ?= 1
     
     # only draw arrowhead if the length of the path is sufficient
     if (length - size) > 5
@@ -285,7 +304,7 @@ class @SoccerMap extends RaphaelMap
       tip = Raphael.getPointAtLength(path, length)
       arrowhead = curve.arrow(base, tip, pointyness)
       
-      @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth })
+      @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth, opacity: opacity })
       
     
   label: (position, label) ->
