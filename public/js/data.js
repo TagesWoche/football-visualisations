@@ -57,8 +57,39 @@
         return this.current === 0;
       },
       getScene: function(index) {
-        this.current = index;
-        return this.scenes[this.current];
+        if (0 <= index && index < this.scenes.length) {
+          return this.scenes[index];
+        }
+      },
+      gotoScene: function(index) {
+        var scene;
+        if (scene = this.getScene(index)) {
+          this.current = index;
+          return scene;
+        }
+      },
+      nextGameScene: function() {
+        var game, lastScene, nextScene;
+        game = this.games[this.scenes[this.current].date];
+        lastScene = game[game.length - 1];
+        if (nextScene = this.getScene(lastScene + 1)) {
+          return {
+            scene: nextScene,
+            index: lastScene + 1
+          };
+        }
+      },
+      previousGameScene: function() {
+        var firstScene, game, lastScenePrevGame, prevGame;
+        game = this.games[this.scenes[this.current].date];
+        firstScene = game[0];
+        if (lastScenePrevGame = this.getScene(firstScene - 1)) {
+          prevGame = this.games[lastScenePrevGame.date];
+          return {
+            scene: this.scenes[prevGame[0]],
+            index: prevGame[0]
+          };
+        }
       },
       loadScenes: function(callback) {
         var _this = this;

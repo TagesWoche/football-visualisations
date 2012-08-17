@@ -145,14 +145,12 @@
               return sum;
             }
           }, 0);
-          console.log("sum is " + gameGradeSum + " and count is " + count);
           if (count === 0) {
             sum.gameAverageGrades.push(0);
           } else {
             sum.gameAverageGrades.push(tageswoche.tableData.round(gameGradeSum / count));
           }
         }
-        console.log(sum);
         return sum;
       },
       aboveNull: function(value) {

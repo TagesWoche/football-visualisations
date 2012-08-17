@@ -67,22 +67,28 @@
 
     SoccerMap.prototype.nextScene = function() {
       this.scene = data.nextScene();
-      if (data.isLastScene()) {
-        $("#next-scene").css("visibility", "hidden");
-      } else {
-        $("#prev-scene").css("visibility", "visible");
-      }
       return this.draw();
     };
 
     SoccerMap.prototype.previousScene = function() {
       this.scene = data.previousScene();
-      if (data.isFirstScene()) {
-        $("#prev-scene").css("visibility", "hidden");
-      } else {
-        $("#next-scene").css("visibility", "visible");
-      }
       return this.draw();
+    };
+
+    SoccerMap.prototype.nextGame = function() {
+      var next;
+      if (next = data.nextGameScene()) {
+        this.scene = data.gotoScene(next.index);
+        return this.draw();
+      }
+    };
+
+    SoccerMap.prototype.previousGame = function() {
+      var prev;
+      if (prev = data.previousGameScene()) {
+        this.scene = data.gotoScene(prev.index);
+        return this.draw();
+      }
     };
 
     SoccerMap.prototype.initEvents = function() {
@@ -95,13 +101,21 @@
         event.preventDefault();
         return _this.previousScene();
       });
+      $("#prev-game").click(function() {
+        event.preventDefault();
+        return _this.previousGame();
+      });
+      $("#next-game").click(function() {
+        event.preventDefault();
+        return _this.nextGame();
+      });
       return $("#scene-list").on("click", "a", function(event) {
         var $this, scene, sceneIndex;
         event.preventDefault();
         $this = $(event.target);
         sceneIndex = $this.parent().data("sceneIndex");
         scene = data.scenes[sceneIndex];
-        _this.scene = data.getScene(sceneIndex);
+        _this.scene = data.gotoScene(sceneIndex);
         return _this.draw();
       });
     };
@@ -139,9 +153,22 @@
     SoccerMap.prototype.updateInfo = function() {
       var $gameLink, game, scene, sceneIndex, ul, _i, _len, _results;
       $("#scene-result .score").html(this.scene.score);
-      $("#scene-result .left").html("FCB");
+      $("#scene-result .left span").html("FCB");
       if (this.scene.opponent) {
-        $("#scene-result .right").html(this.scene.opponent.toUpperCase());
+        $("#scene-result .right span").html(this.scene.opponent.toUpperCase());
+      }
+      $("#prev-scene, #next-scene, #prev-game, #next-game").css("visibility", "visible");
+      if (data.isLastScene()) {
+        $("#next-scene").css("visibility", "hidden");
+      }
+      if (data.isFirstScene()) {
+        $("#prev-scene").css("visibility", "hidden");
+      }
+      if (!data.nextGameScene()) {
+        $("#next-game").css("visibility", "hidden");
+      }
+      if (!data.previousGameScene()) {
+        $("#prev-game").css("visibility", "hidden");
       }
       game = data.games[this.scene.date];
       ul = $("#scene-list").html("");
@@ -172,7 +199,7 @@
           }
           if (length > 1) {
             assistAction = this.actions[length - 2];
-            if (!data.is("Foul", assistAction.specialCondition)) {
+            if (!data.is("Foul", assistAction.specialCondition) && !assistAction.number) {
               return this.scene.assist = assistAction.name;
             }
           }
@@ -194,10 +221,9 @@
         var $this, playerStatistics, playerStats;
         $this = $(this);
         playerStatistics = tageswoche.tableData.getStatisticsForPopup();
-        playerStats = _.find(playerStatistics.list, function(player) {
+        return playerStats = _.find(playerStatistics.list, function(player) {
           return player.nickname === $this.attr("data-playername");
         });
-        return console.log(playerStats);
       });
     };
 

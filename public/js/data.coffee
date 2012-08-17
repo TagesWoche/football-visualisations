@@ -47,10 +47,27 @@ tageswoche.data = do ->
     @current == 0
   
   getScene: (index) ->
-    @current = index
-    @scenes[@current]
-      
-    
+    if 0 <= index && index < @scenes.length
+      @scenes[index]
+  
+  gotoScene: (index) ->
+    if scene = @getScene(index)
+      @current = index
+      scene
+  
+  nextGameScene: () ->
+    game = @games[@scenes[@current].date]
+    lastScene = game[game.length - 1]
+    if nextScene = @getScene(lastScene + 1)
+      { scene: nextScene, index: lastScene + 1 }
+  
+  previousGameScene: () ->
+    game = @games[@scenes[@current].date]
+    firstScene = game[0]
+    if lastScenePrevGame = @getScene(firstScene - 1)
+      prevGame = @games[lastScenePrevGame.date]
+      { scene: @scenes[prevGame[0]], index: prevGame[0] }
+   
   loadScenes: (callback) ->
     if @scenes
       callback(undefined, @scenes)

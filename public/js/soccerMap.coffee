@@ -54,13 +54,21 @@ class @SoccerMap extends RaphaelMap
       
   nextScene: () ->
     @scene = data.nextScene()
-    if data.isLastScene() then $("#next-scene").css("visibility", "hidden") else $("#prev-scene").css("visibility", "visible")
     @draw()
   
   previousScene: () ->
     @scene = data.previousScene()
-    if data.isFirstScene() then $("#prev-scene").css("visibility", "hidden") else $("#next-scene").css("visibility", "visible")
     @draw()
+    
+  nextGame: () ->
+    if next = data.nextGameScene()
+      @scene = data.gotoScene(next.index)
+      @draw()
+  
+  previousGame: () ->
+    if prev = data.previousGameScene()
+      @scene = data.gotoScene(prev.index)
+      @draw()
   
   initEvents: () ->
     $("#next-scene").click =>
@@ -71,12 +79,20 @@ class @SoccerMap extends RaphaelMap
       event.preventDefault()
       @previousScene()
     
+    $("#prev-game").click =>
+      event.preventDefault()
+      @previousGame()
+        
+    $("#next-game").click =>
+      event.preventDefault()
+      @nextGame()
+        
     $("#scene-list").on "click", "a", (event) =>
       event.preventDefault();
       $this = $(event.target)
       sceneIndex = $this.parent().data("sceneIndex")
       scene = data.scenes[sceneIndex]
-      @scene = data.getScene(sceneIndex)
+      @scene = data.gotoScene(sceneIndex)
       @draw()      
 
   draw: ->
@@ -97,6 +113,7 @@ class @SoccerMap extends RaphaelMap
       last = if action.positions.length > 1 then action.positions[( action.positions.length - 1)] else undefined
       action.start = field.calcPosition(first)
       action.end = field.calcPosition(last) if last
+      # !data.is("Foul", action.specialCondition)
     
     # draw visualization elements
     @map.clear()
@@ -109,8 +126,15 @@ class @SoccerMap extends RaphaelMap
   
   updateInfo: ->
     $("#scene-result .score").html(@scene.score)
-    $("#scene-result .left").html("FCB")
-    $("#scene-result .right").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    $("#scene-result .left span").html("FCB")
+    $("#scene-result .right span").html(@scene.opponent.toUpperCase()) if @scene.opponent
+    
+    # update navigation
+    $("#prev-scene, #next-scene, #prev-game, #next-game").css("visibility", "visible")
+    if data.isLastScene() then $("#next-scene").css("visibility", "hidden")
+    if data.isFirstScene() then $("#prev-scene").css("visibility", "hidden")
+    if !data.nextGameScene() then $("#next-game").css("visibility", "hidden")
+    if !data.previousGameScene() then $("#prev-game").css("visibility", "hidden")
     
     game = data.games[@scene.date]
     ul = $("#scene-list").html("")
@@ -135,7 +159,7 @@ class @SoccerMap extends RaphaelMap
         
         if length > 1
           assistAction = @actions[length - 2]
-          if !data.is("Foul", assistAction.specialCondition)
+          if !data.is("Foul", assistAction.specialCondition) && !assistAction.number
             @scene.assist = assistAction.name
     
   sceneInfo: ->
@@ -153,11 +177,8 @@ class @SoccerMap extends RaphaelMap
       $this = $(@)
       playerStatistics = tageswoche.tableData.getStatisticsForPopup()
       playerStats = _.find(playerStatistics.list, (player) ->
-        #console.log(player.nickname)
-        #console.log($this.attr("data-playername"))
         player.nickname == $this.attr("data-playername")
       )
-      console.log(playerStats)
       # TODO: draw the popup
        
   drawPasses: ->
