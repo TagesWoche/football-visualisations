@@ -5,6 +5,7 @@ tageswoche.tableData = do ->
   statistics: {}
   filter: {}
   data: {}
+  limit: 14
   current: "top"
   
   init: () ->
@@ -53,6 +54,7 @@ tageswoche.tableData = do ->
     @current = "top"
     
     $("#stats").html(templates.table({ players : @data.list }))
+    #console.log(@data.list)
     @tablesorter()
     
   showGamesTable: () ->
@@ -60,10 +62,20 @@ tageswoche.tableData = do ->
         
     $("#stats").html(templates.tableGames({ players : @data.list }))
 
-    totalValues = _.map(@data.list[0].grades, (gradeEntry) -> 
-        tageswoche.tableData.round(gradeEntry.gameAverageGrade) )
-    gameNames =   _.map(@data.list[0].grades, (gradeEntry) -> 
-        gradeEntry.opponent )
+    totalValues = _.chain(@data.list[0].grades)
+                    .map((gradeEntry) -> 
+                        tageswoche.tableData.round(gradeEntry.gameAverageGrade) 
+                    )
+                    .last(@limit)
+                    .value()
+        
+    gameNames =   _.chain(@data.list[0].grades)
+                    .map((gradeEntry) -> 
+                        gradeEntry.opponent 
+                    )
+                    .last(@limit)
+                    .value()
+                    
       
     $("#totalGrades").sparkline(totalValues, {
       type: 'bar'
@@ -85,8 +97,12 @@ tageswoche.tableData = do ->
     
     _.each($(".gradesList"), (playerEntry, idx) =>
       $playerEntry = $(playerEntry)
-      playerValues = _.map(@data.list[idx].grades, (gradeEntry) -> 
-          tageswoche.tableData.round(gradeEntry.grade) )
+      playerValues = _.chain(@data.list[idx].grades)
+                        .map((gradeEntry) -> 
+                            tageswoche.tableData.round(gradeEntry.grade) 
+                        )
+                        .last(@limit)
+                        .value()
       
       $playerEntry.sparkline(playerValues,
         type: 'bar'

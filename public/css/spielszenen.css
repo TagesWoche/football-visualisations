@@ -178,13 +178,14 @@ body {
 #player-table .col-yellow { background: #FFF2CC; border-right: 1px solid #E8DBAD; }
 #player-table .col-yellow-red { background: #FFF2CC; border-right: 1px solid #E8DBAD; } /* orange: FCE5CD */
 #player-table .col-red { background: #FFF2CC; border-right: 1px solid #fff; } /* red: F4CCCC */
-#player-table .col-graph { background: #f6f6f6; width: 300px; }
+#player-table .col-graph { background: #f6f6f6; width: 200px; }
 
 #player-table td {
   padding: 3px 4px;
   color: #333;
   border-bottom: 1px solid #ffffff;
 }
+
 
 #player-table td.graph {
   padding: 0 8px;

@@ -10,6 +10,7 @@
       statistics: {},
       filter: {},
       data: {},
+      limit: 14,
       current: "top",
       init: function() {
         var _this = this;
@@ -78,12 +79,12 @@
         $("#stats").html(templates.tableGames({
           players: this.data.list
         }));
-        totalValues = _.map(this.data.list[0].grades, function(gradeEntry) {
+        totalValues = _.chain(this.data.list[0].grades).map(function(gradeEntry) {
           return tageswoche.tableData.round(gradeEntry.gameAverageGrade);
-        });
-        gameNames = _.map(this.data.list[0].grades, function(gradeEntry) {
+        }).last(this.limit).value();
+        gameNames = _.chain(this.data.list[0].grades).map(function(gradeEntry) {
           return gradeEntry.opponent;
-        });
+        }).last(this.limit).value();
         $("#totalGrades").sparkline(totalValues, {
           type: 'bar',
           tooltipFormatter: function(sparklines, options, fields) {
@@ -106,9 +107,9 @@
         _.each($(".gradesList"), function(playerEntry, idx) {
           var $playerEntry, playerValues;
           $playerEntry = $(playerEntry);
-          playerValues = _.map(_this.data.list[idx].grades, function(gradeEntry) {
+          playerValues = _.chain(_this.data.list[idx].grades).map(function(gradeEntry) {
             return tageswoche.tableData.round(gradeEntry.grade);
-          });
+          }).last(_this.limit).value();
           return $playerEntry.sparkline(playerValues, {
             type: 'bar',
             tooltipFormatter: function(sparklines, options, fields) {
