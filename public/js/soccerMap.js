@@ -120,9 +120,13 @@
       });
     };
 
+    SoccerMap.prototype.fcbScene = function() {
+      return this.scene.team.toLowerCase() === "fcb";
+    };
+
     SoccerMap.prototype.draw = function() {
       var action, first, last, _i, _len, _ref;
-      if (this.scene.team.toLowerCase() === "fcb") {
+      if (this.fcbScene()) {
         field.playDirection = "left";
         this.playerColor = this.red;
         this.playerAttributes = this.fcbAttributes;
@@ -203,11 +207,19 @@
           }
           if (length > 1) {
             assistAction = this.actions[length - 2];
-            if (!assistAction.foul && !assistAction.number) {
+            if (!assistAction.foul && !this.otherTeamAction(assistAction)) {
               return this.scene.assist = assistAction.name;
             }
           }
         }
+      }
+    };
+
+    SoccerMap.prototype.otherTeamAction = function(action) {
+      if (this.fcbScene()) {
+        return !action.number;
+      } else {
+        return !!action.number;
       }
     };
 

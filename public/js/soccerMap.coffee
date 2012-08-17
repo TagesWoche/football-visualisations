@@ -94,9 +94,12 @@ class @SoccerMap extends RaphaelMap
       scene = data.scenes[sceneIndex]
       @scene = data.gotoScene(sceneIndex)
       @draw()      
-
+  
+  fcbScene: ->
+    @scene.team.toLowerCase() == "fcb"
+    
   draw: ->
-    if @scene.team.toLowerCase() == "fcb" 
+    if @fcbScene()
       field.playDirection = "left" 
       @playerColor = @red
       @playerAttributes = @fcbAttributes
@@ -163,11 +166,20 @@ class @SoccerMap extends RaphaelMap
         else if goalAction.indirectFreeKick
           @scene.goal = "#{ @scene.goal } (Freistoss indirekt)"
         
+        # attribute assist if it makes sense
         if length > 1
           assistAction = @actions[length - 2]
-          if !assistAction.foul && !assistAction.number
+          if !assistAction.foul && !@otherTeamAction(assistAction)
             @scene.assist = assistAction.name
-    
+  
+  # determine if the action is from a player from the opposing team
+  # if an action has a player number its an fcb action
+  otherTeamAction: (action) ->
+    if @fcbScene()
+      !action.number
+    else
+      !!action.number
+     
   sceneInfo: ->
     @extractSceneInfo()
     
