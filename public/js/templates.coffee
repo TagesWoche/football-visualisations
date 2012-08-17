@@ -99,10 +99,7 @@
             <td class="center"><%= player.played %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
-            <td class="gradesList bar graph">
-              <% _.each(player.grades, function(gradeEntry){ %> 
-                <%= gradeEntry.grade+"," %>
-              <% }); %>  
+            <td class="gradesList bar graph"> 
             </td>
           </tr>
         <% }); %>

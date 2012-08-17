@@ -55,12 +55,12 @@
         return this.tablesorter();
       },
       showGamesTable: function() {
-        var gameNames, totalValues;
+        var gameNames, totalValues,
+          _this = this;
         this.current = "games";
         $("#stats").html(templates.tableGames({
           players: this.data.list
         }));
-        console.log(this.data.list);
         totalValues = _.map(this.data.list[0].grades, function(gradeEntry) {
           return tageswoche.tableData.round(gradeEntry.gameAverageGrade);
         });
@@ -86,28 +86,35 @@
             "5.01:6": '#1BA755'
           }
         });
-        $(".gradesList").sparkline('html', {
-          type: 'bar',
-          height: 15,
-          barWidth: 12,
-          barSpacing: 2,
-          colorMap: {
-            "": '#F6F6F6',
-            "0": '#F6F6F6',
-            "0.01:1": '#E92431',
-            "1.01:2": '#EB4828',
-            "2.01:3": '#F9892E',
-            "3.01:4": '#EAE600',
-            "4.01:5": '#7FC249',
-            "5.01:6": '#1BA755'
-          },
-          tooltipFormatter: function(sparklines, options, fields) {
-            if (fields[0].value === 0) {
-              return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
-            } else {
-              return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+        _.each($(".gradesList"), function(playerEntry, idx) {
+          var $playerEntry, playerValues;
+          $playerEntry = $(playerEntry);
+          playerValues = _.map(_this.data.list[idx].grades, function(gradeEntry) {
+            return tageswoche.tableData.round(gradeEntry.grade);
+          });
+          return $playerEntry.sparkline(playerValues, {
+            type: 'bar',
+            tooltipFormatter: function(sparklines, options, fields) {
+              if (fields[0].value === 0) {
+                return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
+              } else {
+                return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+              }
+            },
+            height: 15,
+            barWidth: 12,
+            barSpacing: 2,
+            colorMap: {
+              "": '#F6F6F6',
+              "0": '#F6F6F6',
+              "0.01:1": '#E92431',
+              "1.01:2": '#EB4828',
+              "2.01:3": '#F9892E',
+              "3.01:4": '#EAE600',
+              "4.01:5": '#7FC249',
+              "5.01:6": '#1BA755'
             }
-          }
+          });
         });
         return this.tablesorter();
       },
