@@ -4,24 +4,17 @@
   this.tageswoche = this.tageswoche || {};
 
   tageswoche.data = (function() {
-    var specialConditions;
-    specialConditions = {
-      "Freistoss direkt": "fd",
-      "Freistoss indirekt": "fi",
-      "Ecke": "e",
-      "Penalty": "p",
-      "Penaltyschiessen": "ps",
-      "Einwurf": "ew",
-      "Foul": "f"
+    var specialConditionsAttr;
+    specialConditionsAttr = {
+      "fd": "directFreeKick",
+      "fi": "indirectFreeKick",
+      "e": "corner",
+      "p": "penalty",
+      "ps": "penaltyShootout",
+      "ew": "throwIn",
+      "f": "foul"
     };
     return {
-      is: function(condition, code) {
-        if (condition && code) {
-          return specialConditions[condition] === code.toLowerCase();
-        } else {
-          return false;
-        }
-      },
       scenes: void 0,
       games: {},
       current: -1,
@@ -101,12 +94,19 @@
           url: "http://tageswoche.herokuapp.com/fcb/situations",
           dataType: "jsonp"
         }).done(function(data) {
-          var entry, _i, _len;
+          var action, entry, _i, _j, _len, _len1, _ref;
           data = data.list;
           _this.scenes = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             entry = data[_i];
             if (!/g:/i.test(entry.scorePosition)) {
+              _ref = entry.playerPositions;
+              for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                action = _ref[_j];
+                if (action.specialCondition) {
+                  action[specialConditionsAttr[action.specialCondition.toLowerCase()]] = true;
+                }
+              }
               _this.addSceneToGame({
                 actions: entry.playerPositions,
                 score: entry.score,

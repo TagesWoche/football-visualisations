@@ -45,6 +45,18 @@ tageswoche.field = do ->
   
     { x: @scale * x, y: @scale * y }
 
+  calcPenaltyPosition: ->
+    correction = (@scale * @cellWidth / 2)
+    
+    if @playDirection == "left"
+      pos = @calcPosition("C6")
+      pos.x = pos.x - correction
+    else
+      pos = @calcPosition("C6", true)
+      pos.x = pos.x + correction
+      
+    pos
+    
   goalPosition: ( scorePosition ) ->
     position = { horizontal: 1, vertical: 6 }
     

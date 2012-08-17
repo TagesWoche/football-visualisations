@@ -41,6 +41,18 @@
           y: this.scale * y
         };
       },
+      calcPenaltyPosition: function() {
+        var correction, pos;
+        correction = this.scale * this.cellWidth / 2;
+        if (this.playDirection === "left") {
+          pos = this.calcPosition("C6");
+          pos.x = pos.x - correction;
+        } else {
+          pos = this.calcPosition("C6", true);
+          pos.x = pos.x + correction;
+        }
+        return pos;
+      },
       goalPosition: function(scorePosition) {
         var height, index, position, x, y, _i, _len, _ref;
         position = {

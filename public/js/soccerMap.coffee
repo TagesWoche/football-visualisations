@@ -110,10 +110,16 @@ class @SoccerMap extends RaphaelMap
     # prepare the positions
     for action in @actions
       first = action.positions[0]
-      last = if action.positions.length > 1 then action.positions[( action.positions.length - 1)] else undefined
+      last = action.positions[( action.positions.length - 1)]
+      
+      if action.positions.length > 1
+        action.running = true
+        
       action.start = field.calcPosition(first)
-      action.end = field.calcPosition(last) if last
-      # !data.is("Foul", action.specialCondition)
+      action.end = if action.running then field.calcPosition(last) else action.start
+        
+      if action.penalty
+        action.end = field.calcPenaltyPosition()
     
     # draw visualization elements
     @map.clear()
@@ -148,18 +154,18 @@ class @SoccerMap extends RaphaelMap
     length = @actions.length
     if length
       goalAction = @actions[length - 1]
-      if !data.is("Foul", goalAction.specialCondition)
+      if !goalAction.foul
         @scene.goal = goalAction.name
-        if data.is("Penalty", goalAction.specialCondition)
+        if goalAction.penalty
           @scene.goal = "#{ @scene.goal } (Penalty)"
-        else if data.is("Freistoss direkt", goalAction.specialCondition)
+        else if goalAction.directFreeKick
           @scene.goal = "#{ @scene.goal } (Freistoss direkt)"
-        else if data.is("Freistoss indirekt", goalAction.specialCondition)
+        else if goalAction.indirectFreeKick
           @scene.goal = "#{ @scene.goal } (Freistoss indirekt)"
         
         if length > 1
           assistAction = @actions[length - 2]
-          if !data.is("Foul", assistAction.specialCondition) && !assistAction.number
+          if !assistAction.foul && !assistAction.number
             @scene.assist = assistAction.name
     
   sceneInfo: ->
@@ -184,17 +190,17 @@ class @SoccerMap extends RaphaelMap
   drawPasses: ->
     lastPosition = undefined
     for action in @actions
-      if action.end
+      if action.running
         @drawSprint(action.start, action.end)
         
       if lastPosition
         @addPass(lastPosition, action.start)
       
-      if data.is("Foul", action.specialCondition)
+      if action.foul
         # don't draw a pass from a foul position to the next one
         lastPosition = undefined
       else
-        lastPosition = if action.end then action.end else action.start
+        lastPosition = action.end
     
     # draw goal
     if lastPosition
@@ -207,19 +213,19 @@ class @SoccerMap extends RaphaelMap
       # hack: show all players with numbers as fcb Players 
       # ...this only makes a difference in scenes of the opponent
       currentAttributes = if action.number then @fcbAttributes else @playerAttributes
+      
+      start = action.start 
+      player = action.end
         
-      if action.end
-        start = action.start 
-        player = action.end
-      else
-        player = action.start
-        
-      # start position (optional)
-      if start
+      # draw start position (only for running players)
+      if action.running
         @map.circle( start.x, start.y, (@circleRadius * 0.5) ).attr(currentAttributes)
         # @label(start, action.number) if action.number
         
       # player position
+      if action.penalty
+        currentAttributes = $.extend({}, currentAttributes, { stroke: @white })
+        
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
       $circle.attr("data-playername", action.name)

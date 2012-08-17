@@ -2,20 +2,15 @@
 
 tageswoche.data = do ->
   
-  specialConditions =
-    "Freistoss direkt": "fd"
-    "Freistoss indirekt": "fi"
-    "Ecke": "e"
-    "Penalty": "p"
-    "Penaltyschiessen": "ps"
-    "Einwurf": "ew"
-    "Foul": "f"
-
-  is: (condition, code) ->
-    if condition && code
-      specialConditions[condition] == code.toLowerCase()
-    else
-      false
+  # used to define attributes on every action with a special condition
+  specialConditionsAttr =
+    "fd": "directFreeKick" 
+    "fi": "indirectFreeKick"
+    "e" : "corner"
+    "p" : "penalty"
+    "ps": "penaltyShootout"
+    "ew": "throwIn"
+    "f" : "foul"
     
   scenes: undefined
   games: {}
@@ -83,7 +78,12 @@ tageswoche.data = do ->
       for entry in data
         
         # filter out gehaltene penaltys (z.B. "g:ur")
-        if !/g:/i.test(entry.scorePosition)      
+        if !/g:/i.test(entry.scorePosition)
+          
+          for action in entry.playerPositions
+            if action.specialCondition
+              action[ specialConditionsAttr[ action.specialCondition.toLowerCase() ] ] = true
+                 
           @addSceneToGame(
             actions: entry.playerPositions
             score: entry.score
