@@ -20,7 +20,7 @@
       <thead>
         <tr>
           <th>Spieler</th>
-          <th>Position</th>
+          <th>Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
@@ -75,6 +75,8 @@
         </tr>
       </tbody>
     </table>
+    <br/>
+    <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
   
@@ -92,7 +94,7 @@
       <thead>
         <tr>
           <th>Spieler</th>
-          <th>Position</th>
+          <th>Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
@@ -132,6 +134,8 @@
         </tr>
       </tbody>
     </table>
+    <br/>
+    <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
   

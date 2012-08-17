@@ -51,10 +51,8 @@ tageswoche.tableData = do ->
       return
   
   showTopTable: () ->
-    @current = "top"
-    
+    @current = "top"   
     $("#stats").html(templates.table({ players : @data.list }))
-    #console.log(@data.list)
     @tablesorter()
     
   showGamesTable: () ->

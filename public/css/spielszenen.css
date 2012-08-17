@@ -186,6 +186,10 @@ body {
   border-bottom: 1px solid #ffffff;
 }
 
+.legend {
+  font-size: 0.7em;
+  color: #333;
+}
 
 #player-table td.graph {
   padding: 0 8px;
