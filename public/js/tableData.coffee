@@ -9,25 +9,18 @@ tageswoche.tableData = do ->
   current: "top"
   
   init: () ->
-    @loadStatistics @filter, (data) =>
-      @data = data
-      @initEvents()
-      @showTopTable()
+    @initEvents()
+    @loadStatistics(@filter, $.proxy(@redrawTable, @))
       
-    _this = @  
-    $("#location-filter").on "change", (event) ->
-      $this = $(@)
-      _this.filter = { location: $this.val() }
-      _this.loadStatistics _this.filter, (data) ->
-        _this.data = data
-        _this.initEvents()
-        if _this.current == "top"
-          _this.showTopTable()
-        else
-          _this.showGamesTable()
+    $("#location-filter").on "change", (event) =>
+      $this = $(event.currentTarget)
+      @filter = { location: $this.val() }
+      @loadStatistics(@filter, $.proxy(@redrawTable, @))
           
-
-
+  redrawTable: (data) ->
+    @data = data
+    @drawTable(@current)
+    
   getStatisticsForPopup: ->
     @statistics["all"]
         
@@ -49,15 +42,20 @@ tageswoche.tableData = do ->
         @statistics[filterString] = data
         callback(data)
       return
-  
+      
+  drawTable: (tableName) ->
+    @current = tableName
+    
+    switch tableName
+      when "top" then @showTopTable()
+      when "games" then @showGamesTable()
+      when "scenes" then @showScenesTable()
+          
   showTopTable: () ->
-    @current = "top"   
     $("#stats").html(templates.table({ players : @data.list }))
     @tablesorter()
     
   showScenesTable: () ->
-    @current = "scenes"
-    
     $("#stats").html(templates.tableScenes({ players : @data.list }))  
     _.each($(".scoresList"), (playerEntry, idx) =>
       $playerEntry = $(playerEntry)
@@ -79,17 +77,12 @@ tageswoche.tableData = do ->
         barWidth: 12
         barSpacing: 2
       
-      )
-      
+      ) 
     )
-    
-    
     
     @tablesorter()
     
   showGamesTable: () ->
-    @current = "games"
-        
     $("#stats").html(templates.tableGames({ players : @data.list }))
 
     totalValues = _.chain(@data.list[0].grades)
@@ -156,7 +149,6 @@ tageswoche.tableData = do ->
           "5.01:6": '#1BA755'
       
       )
-      
       )
     @tablesorter()
     
@@ -165,15 +157,13 @@ tageswoche.tableData = do ->
       sortInitialOrder: "desc"
       rememberSorting: false
     )
-  
+      
   initEvents: () ->
     $("#stats").on "click", "td", (event) =>
-      if $(event.target).parent().parent("tbody").length
-        if @current == "top"
-          #@showGamesTable()
-          @showScenesTable()
-        else
-          @showTopTable()
+      if @current != "top"
+        @drawTable("top")
+      else
+        @drawTable("scenes")
   
   totals: (players) ->
     sum = { played: 0, minutes: 0, grades: [], goals: 0, assists: 0, yellowCards: 0, yellowRedCards: 0, redCards: 0, gameAverageGrades: [] }

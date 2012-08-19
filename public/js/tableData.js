@@ -14,28 +14,20 @@
       current: "top",
       init: function() {
         var _this = this;
-        this.loadStatistics(this.filter, function(data) {
-          _this.data = data;
-          _this.initEvents();
-          return _this.showTopTable();
-        });
-        _this = this;
+        this.initEvents();
+        this.loadStatistics(this.filter, $.proxy(this.redrawTable, this));
         return $("#location-filter").on("change", function(event) {
           var $this;
-          $this = $(this);
+          $this = $(event.currentTarget);
           _this.filter = {
             location: $this.val()
           };
-          return _this.loadStatistics(_this.filter, function(data) {
-            _this.data = data;
-            _this.initEvents();
-            if (_this.current === "top") {
-              return _this.showTopTable();
-            } else {
-              return _this.showGamesTable();
-            }
-          });
+          return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
         });
+      },
+      redrawTable: function(data) {
+        this.data = data;
+        return this.drawTable(this.current);
       },
       getStatisticsForPopup: function() {
         return this.statistics["all"];
@@ -65,8 +57,18 @@
           });
         }
       },
+      drawTable: function(tableName) {
+        this.current = tableName;
+        switch (tableName) {
+          case "top":
+            return this.showTopTable();
+          case "games":
+            return this.showGamesTable();
+          case "scenes":
+            return this.showScenesTable();
+        }
+      },
       showTopTable: function() {
-        this.current = "top";
         $("#stats").html(templates.table({
           players: this.data.list
         }));
@@ -74,7 +76,6 @@
       },
       showScenesTable: function() {
         var _this = this;
-        this.current = "scenes";
         $("#stats").html(templates.tableScenes({
           players: this.data.list
         }));
@@ -96,7 +97,6 @@
       showGamesTable: function() {
         var gameNames, totalValues,
           _this = this;
-        this.current = "games";
         $("#stats").html(templates.tableGames({
           players: this.data.list
         }));
@@ -166,12 +166,10 @@
       initEvents: function() {
         var _this = this;
         return $("#stats").on("click", "td", function(event) {
-          if ($(event.target).parent().parent("tbody").length) {
-            if (_this.current === "top") {
-              return _this.showScenesTable();
-            } else {
-              return _this.showTopTable();
-            }
+          if (_this.current !== "top") {
+            return _this.drawTable("top");
+          } else {
+            return _this.drawTable("scenes");
           }
         });
       },
