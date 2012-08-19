@@ -693,7 +693,7 @@
                     if (!this.tHead || !this.tBodies) return;
                     // declare
                     var $this, $document, $headers, cache, config, shiftDown = 0,
-                        sortOrder;
+                        sortOrder, lastSortedColumn;
                     // new blank config object
                     this.config = {};
                     // merge and extend.
@@ -727,7 +727,16 @@
                             // get current column index
                             var i = this.column;
                             // get current column sort order
-                            this.order = this.count++ % 2;
+                            
+                            // tageswoche fix
+                            if (lastSortedColumn && lastSortedColumn === this) {
+                              this.order = this.count++ % 2;
+                            } else {
+                              this.count = 0;
+                            }
+                              
+                            lastSortedColumn = this;
+                            
 							// always sort on the locked order.
 							if(this.lockedOrder) this.order = this.lockedOrder;
 							

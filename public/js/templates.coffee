@@ -20,7 +20,7 @@
       <thead>
         <tr>
           <th>Spieler</th>
-          <th>Position*</th>
+          <th class="headerSortDown">Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>
@@ -94,7 +94,7 @@
       <thead>
         <tr>
           <th>Spieler</th>
-          <th>Position*</th>
+          <th class="headerSortDown">Position*</th>
           <th>Einsätze</th>
           <th>Minuten</th>
           <th>&oslash; Bewertung</th>

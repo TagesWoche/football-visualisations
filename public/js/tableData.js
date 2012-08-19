@@ -14,6 +14,7 @@
       current: "top",
       init: function() {
         var _this = this;
+        this.prepareTablesorter();
         this.initEvents();
         this.loadStatistics(this.filter, $.proxy(this.redrawTable, this));
         return $("#location-filter").on("change", function(event) {
@@ -159,10 +160,60 @@
         });
         return this.tablesorter();
       },
+      prepareTablesorter: function() {
+        $.tablesorter.addParser({
+          id: 'position',
+          is: function(s) {
+            return false;
+          },
+          format: function(value) {
+            return value = value.toLowerCase().replace(/tw/i, 4).replace(/ve/i, 3).replace(/mf/i, 2).replace(/st/i, 1);
+          },
+          type: 'numeric'
+        });
+        return $.tablesorter.addParser({
+          id: 'reverse',
+          is: function(s) {
+            return false;
+          },
+          format: function(value) {
+            if (value) {
+              return -value;
+            } else {
+              return -10000000;
+            }
+          },
+          type: 'numeric'
+        });
+      },
       tablesorter: function() {
+        var headers;
+        headers = (function() {
+          switch (this.current) {
+            case "top":
+              return {
+                1: {
+                  sorter: "position"
+                }
+              };
+            case "games":
+              return {
+                1: {
+                  sorter: "position"
+                }
+              };
+            case "scenes":
+              return {
+                5: {
+                  sorter: "reverse"
+                }
+              };
+          }
+        }).call(this);
         return $("#player-table").tablesorter({
           sortInitialOrder: "desc",
-          rememberSorting: false
+          rememberSorting: true,
+          headers: headers
         });
       },
       initEvents: function() {
@@ -177,6 +228,13 @@
           } else if ($this.hasClass("scenes-table")) {
             return _this.drawTable("scenes");
           }
+        });
+        $("#stats").on("click", "th", function(event) {
+          var $this;
+          console.log("hey");
+          $this = $(event.currentTarget);
+          $("#stats th").removeClass("active");
+          return $this.addClass("active");
         });
         return $("#table-nav li a").on("click", function(event) {
           var $this;

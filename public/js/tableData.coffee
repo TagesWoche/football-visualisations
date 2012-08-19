@@ -9,6 +9,7 @@ tageswoche.tableData = do ->
   current: "top"
   
   init: () ->
+    @prepareTablesorter()
     @initEvents()
     @loadStatistics(@filter, $.proxy(@redrawTable, @))
       
@@ -155,11 +156,48 @@ tageswoche.tableData = do ->
       )
     @tablesorter()
     
-  tablesorter: () ->
-    $("#player-table").tablesorter(
-      sortInitialOrder: "desc"
-      rememberSorting: false
+  
+  prepareTablesorter: () ->
+    $.tablesorter.addParser(
+      id: 'position'
+      is: (s) ->
+        false # return false so this parser is not auto detected
+          
+      format: (value) -> 
+        # format your data for normalization 
+        value = value.toLowerCase().replace(/tw/i, 4).replace(/ve/i, 3).replace(/mf/i, 2).replace(/st/i, 1)
+          
+      type: 'numeric' # set type, either numeric or text 
     )
+    
+    $.tablesorter.addParser(
+      id: 'reverse'
+      is: (s) ->
+        false # return false so this parser is not auto detected 
+          
+      format: (value) -> 
+        # format your data for normalization 
+        if value then -value else -10000000
+          
+      type: 'numeric' # set type, either numeric or text 
+    )
+    
+  tablesorter: () ->
+    headers = switch @current
+      when "top"
+        1:
+          sorter: "position"
+      when "games"
+        1:
+          sorter: "position"
+      when "scenes"
+        5:
+          sorter: "reverse"
+        
+    $("#player-table").tablesorter
+      sortInitialOrder: "desc"
+      rememberSorting: true
+      headers: headers
       
   initEvents: () ->
     
@@ -173,6 +211,14 @@ tageswoche.tableData = do ->
         @drawTable("games")
       else if $this.hasClass("scenes-table")
         @drawTable("scenes")
+        
+    # table header sorting
+    $("#stats").on "click", "th", (event) =>
+      console.log("hey")
+      $this = $(event.currentTarget)
+      
+      $("#stats th").removeClass("active")
+      $this.addClass("active")
       
     # navigation clicks 
     $("#table-nav li a").on "click", (event) =>

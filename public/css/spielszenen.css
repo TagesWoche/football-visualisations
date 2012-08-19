@@ -221,6 +221,7 @@ body {
 
 #player-table thead th {
   font-size: 11px;
+  font-weight: bold;
   padding: 6px 4px;
   color: #333;
   background: #f6f6f6;
@@ -231,10 +232,19 @@ body {
 }
 
 #player-table thead th:hover {
-  font-size: 11px;
   color: #fff;
   background: #777;
-  font-weight: bold;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+#player-table th.headerSortUp,
+#player-table th.headerSortDown {
+  background: #ddd;
   -webkit-border-top-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
   -moz-border-radius-topleft: 5px;
