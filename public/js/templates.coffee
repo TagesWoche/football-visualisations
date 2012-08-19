@@ -106,9 +106,9 @@
           <tr>
             <td><%= player.name %></td>
             <td class="center td-position"><%= player.position %></td>
-            <td class="center"><%= player.played %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
+            <td class="center top-table"><%= player.played %></td>
+            <td class="center top-table"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
+            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
             <td class="gradesList bar graph graph-column"> 
             </td>
           </tr>
@@ -166,11 +166,11 @@
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
-            <td class="center"><%= player.played %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>  
-            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>
+            <td class="center games-table"><%= player.played %></td>
+            <td class="center top-table"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
+            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>
+            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>  
+            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>
             <td class="scoresList bar graph graph-column"></td>
           </tr>
         <% }); %>

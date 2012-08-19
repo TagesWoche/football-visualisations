@@ -170,7 +170,7 @@
         $("#stats").on("click", "td", function(event) {
           var $this;
           $this = $(event.currentTarget);
-          if (_this.current !== "top") {
+          if ($this.hasClass("top-table")) {
             return _this.drawTable("top");
           } else if ($this.hasClass("games-table")) {
             return _this.drawTable("games");

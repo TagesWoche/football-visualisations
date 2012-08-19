@@ -167,7 +167,7 @@ tageswoche.tableData = do ->
     $("#stats").on "click", "td", (event) =>
       $this = $(event.currentTarget)
       
-      if @current != "top"
+      if $this.hasClass("top-table")
         @drawTable("top")
       else if $this.hasClass("games-table")
         @drawTable("games")
@@ -177,8 +177,8 @@ tageswoche.tableData = do ->
     # navigation clicks 
     $("#table-nav li a").on "click", (event) =>
       event.preventDefault()
-      
       $this = $(event.currentTarget)
+      
       if $this.hasClass("top-table")
         @drawTable("top")
       else if $this.hasClass("games-table")
