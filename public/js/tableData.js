@@ -59,6 +59,8 @@
       },
       drawTable: function(tableName) {
         this.current = tableName;
+        $("#table-nav li a.active").removeClass("active");
+        $("#table-nav li a." + tableName + "-table").addClass("active");
         switch (tableName) {
           case "top":
             return this.showTopTable();
@@ -165,10 +167,26 @@
       },
       initEvents: function() {
         var _this = this;
-        return $("#stats").on("click", "td", function(event) {
+        $("#stats").on("click", "td", function(event) {
+          var $this;
+          $this = $(event.currentTarget);
           if (_this.current !== "top") {
             return _this.drawTable("top");
-          } else {
+          } else if ($this.hasClass("games-table")) {
+            return _this.drawTable("games");
+          } else if ($this.hasClass("scenes-table")) {
+            return _this.drawTable("scenes");
+          }
+        });
+        return $("#table-nav li a").on("click", function(event) {
+          var $this;
+          event.preventDefault();
+          $this = $(event.currentTarget);
+          if ($this.hasClass("top-table")) {
+            return _this.drawTable("top");
+          } else if ($this.hasClass("games-table")) {
+            return _this.drawTable("games");
+          } else if ($this.hasClass("scenes-table")) {
             return _this.drawTable("scenes");
           }
         });

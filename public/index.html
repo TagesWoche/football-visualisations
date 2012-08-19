@@ -32,15 +32,27 @@
       <!-- statistics -->
       <div id="table-container">
         <h1 style="margin:0 0 20px;">Spieler-Statistik</h1>
-        <form>
-        Filter:
-        <select name="location" id="location-filter">
-        	<option value="">Alle Spiele</option>
-        	<option value="home">Heimspiele</option>
-        	<option value="out">Auswärtsspiele</option>
-        </select>
-        </form>
-        <hr/>
+        
+        <div id="table-nav">
+          <ul>
+            <li><a href="" class="top-table active">Übersicht</a></li>
+            <li><a href="" class="games-table">Spiele</a></li>
+            <li><a href="" class="scenes-table">Tore</a></li>
+          </ul>
+        
+          <div id="table-filter">
+            <form>
+            <span>Filter:</span>
+            <select name="location" id="location-filter">
+            	<option value="">Alle Spiele</option>
+            	<option value="home">Heimspiele</option>
+            	<option value="out">Auswärtsspiele</option>
+            </select>
+            </form>
+          </div>
+          <div class="clear"></div>
+        </div>
+        
         <div id="stats">
           <div class="loading">loading...</div>
         </div>

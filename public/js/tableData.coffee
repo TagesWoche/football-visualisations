@@ -46,6 +46,9 @@ tageswoche.tableData = do ->
   drawTable: (tableName) ->
     @current = tableName
     
+    $("#table-nav li a.active").removeClass("active")
+    $("#table-nav li a.#{ tableName }-table").addClass("active")
+    
     switch tableName
       when "top" then @showTopTable()
       when "games" then @showGamesTable()
@@ -159,11 +162,30 @@ tageswoche.tableData = do ->
     )
       
   initEvents: () ->
+    
+    # direct clicks on table tds
     $("#stats").on "click", "td", (event) =>
+      $this = $(event.currentTarget)
+      
       if @current != "top"
         @drawTable("top")
-      else
+      else if $this.hasClass("games-table")
+        @drawTable("games")
+      else if $this.hasClass("scenes-table")
         @drawTable("scenes")
+      
+    # navigation clicks 
+    $("#table-nav li a").on "click", (event) =>
+      event.preventDefault()
+      
+      $this = $(event.currentTarget)
+      if $this.hasClass("top-table")
+        @drawTable("top")
+      else if $this.hasClass("games-table")
+        @drawTable("games")
+      else if $this.hasClass("scenes-table")
+        @drawTable("scenes")
+        
   
   totals: (players) ->
     sum = { played: 0, minutes: 0, grades: [], goals: 0, assists: 0, yellowCards: 0, yellowRedCards: 0, redCards: 0, gameAverageGrades: [] }

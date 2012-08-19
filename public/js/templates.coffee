@@ -35,12 +35,12 @@
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
-            <td><%= player.position %></td>
-            <td class="center"><%= player.played %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>
+            <td class="center td-position"><%= player.position %></td>
+            <td class="center games-table"><%= player.played %></td>
+            <td class="center games-table"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
+            <td class="center games-table"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
+            <td class="center scenes-table"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
+            <td class="center scenes-table"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>
@@ -105,7 +105,7 @@
         <% _.each(players, function(player) { %>
           <tr>
             <td><%= player.name %></td>
-            <td><%= player.position %></td>
+            <td class="center td-position"><%= player.position %></td>
             <td class="center"><%= player.played %></td>
             <td class="center"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
