@@ -69,14 +69,18 @@ tageswoche.tableData = do ->
                         )
                         .last(@limit)
                         .value()
+      
+      gameNames =   _.chain(@data.list[0].scores)
+                      .map((gradeEntry) -> 
+                          gradeEntry.opponent 
+                      )
+                      .last(@limit)
+                      .value()
                         
       $playerEntry.sparkline(playerScores,
         type: 'bar'
-        # tooltipFormatter: (sparklines, options, fields) ->
-        #          if fields[0].value == 0
-        #            "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
-        #          else      
-        #            "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"    
+        tooltipFormatter: (sparklines, options, fields) ->
+          "Gegner #{gameNames[fields[0].offset]}. <br/> Tore: #{fields[0].value}, Assists: #{fields[1].value}"    
         height: 15
         barWidth: 12
         barSpacing: 2

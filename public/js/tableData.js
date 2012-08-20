@@ -83,13 +83,19 @@
           players: this.data.list
         }));
         _.each($(".scoresList"), function(playerEntry, idx) {
-          var $playerEntry, playerScores;
+          var $playerEntry, gameNames, playerScores;
           $playerEntry = $(playerEntry);
           playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
             return scoreEntry.scores;
           }).last(_this.limit).value();
+          gameNames = _.chain(_this.data.list[0].scores).map(function(gradeEntry) {
+            return gradeEntry.opponent;
+          }).last(_this.limit).value();
           return $playerEntry.sparkline(playerScores, {
             type: 'bar',
+            tooltipFormatter: function(sparklines, options, fields) {
+              return "Gegner " + gameNames[fields[0].offset] + ". <br/> Tore: " + fields[0].value + ", Assists: " + fields[1].value;
+            },
             height: 15,
             barWidth: 12,
             barSpacing: 2
