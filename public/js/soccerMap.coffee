@@ -73,19 +73,19 @@ class @SoccerMap extends RaphaelMap
       @draw()
   
   initEvents: () ->
-    $("#next-scene").click =>
+    $("#next-scene").click (event) =>
       event.preventDefault()
       @nextScene()
     
-    $("#prev-scene").click =>
+    $("#prev-scene").click (event) =>
       event.preventDefault()
       @previousScene()
     
-    $("#prev-game").click =>
+    $("#prev-game").click (event) =>
       event.preventDefault()
       @previousGame()
         
-    $("#next-game").click =>
+    $("#next-game").click (event) =>
       event.preventDefault()
       @nextGame()
         

@@ -95,19 +95,19 @@
 
     SoccerMap.prototype.initEvents = function() {
       var _this = this;
-      $("#next-scene").click(function() {
+      $("#next-scene").click(function(event) {
         event.preventDefault();
         return _this.nextScene();
       });
-      $("#prev-scene").click(function() {
+      $("#prev-scene").click(function(event) {
         event.preventDefault();
         return _this.previousScene();
       });
-      $("#prev-game").click(function() {
+      $("#prev-game").click(function(event) {
         event.preventDefault();
         return _this.previousGame();
       });
-      $("#next-game").click(function() {
+      $("#next-game").click(function(event) {
         event.preventDefault();
         return _this.nextGame();
       });
