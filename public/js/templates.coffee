@@ -64,8 +64,8 @@
           <% sum = tageswoche.tableData.totals( players ) %>
           <td>Total</td>
           <td></td>
-          <td><%= sum.played %></td>
-          <td><%= sum.minutes %></td>
+          <td></td>
+          <td></td>
           <td><%= sum.averageGrade %></td>
           <td><%= sum.goals %></td>
           <td><%= sum.assists %></td>
@@ -126,8 +126,8 @@
         <tr>
           <td>Total</td>
           <td></td>
-          <td><%= sum.played %></td>
-          <td><%= sum.minutes %></td>
+          <td></td>
+          <td></td>
           <td><%= sum.averageGrade %></td>
           <td class="bar graph graph-column" id="totalGrades" style="text-align: left">
           </td>
@@ -188,7 +188,7 @@
         <tr>
           <% sum = tageswoche.tableData.totals( players ) %>
           <td>Total</td>
-          <td><%= sum.played %></td>
+          <td></td>
           <td><%= sum.goals %></td>
           <td><%= sum.assists %></td>
           <td><%= sum.goals + sum.assists %></td>

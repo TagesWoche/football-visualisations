@@ -1178,8 +1178,8 @@
             formatter = options.get('tooltipFormatter');
             if (formatter) {
               var formatterRes = formatter(this, options, fields);
-              console.log("formatter result");
-              console.log(formatterRes);
+              //console.log("formatter result");
+              //console.log(formatterRes);
                 return formatterRes;
             }
             if (options.get('tooltipChartTitle')) {

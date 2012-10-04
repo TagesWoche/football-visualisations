@@ -62,10 +62,11 @@ tageswoche.tableData = do ->
   showScenesTable: () ->
     $("#stats").html(templates.tableScenes({ players : @data.list }))  
     _.each($(".scoresList"), (playerEntry, idx) =>
+      console.log(@data.list[idx].scores)
       $playerEntry = $(playerEntry)
       playerScores = _.chain(@data.list[idx].scores)
                         .map((scoreEntry) ->
-                          scoreEntry.scores
+                          scoreEntry.scores.reverse()
                         )
                         .last(@limit)
                         .value()
@@ -218,7 +219,6 @@ tageswoche.tableData = do ->
         
     # table header sorting
     $("#stats").on "click", "th", (event) =>
-      console.log("hey")
       $this = $(event.currentTarget)
       
       $("#stats th").removeClass("active")

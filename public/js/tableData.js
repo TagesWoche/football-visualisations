@@ -84,9 +84,10 @@
         }));
         _.each($(".scoresList"), function(playerEntry, idx) {
           var $playerEntry, gameNames, playerScores;
+          console.log(_this.data.list[idx].scores);
           $playerEntry = $(playerEntry);
           playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
-            return scoreEntry.scores;
+            return scoreEntry.scores.reverse();
           }).last(_this.limit).value();
           gameNames = _.chain(_this.data.list[0].scores).map(function(gradeEntry) {
             return gradeEntry.opponent;
@@ -237,7 +238,6 @@
         });
         $("#stats").on("click", "th", function(event) {
           var $this;
-          console.log("hey");
           $this = $(event.currentTarget);
           $("#stats th").removeClass("active");
           return $this.addClass("active");
