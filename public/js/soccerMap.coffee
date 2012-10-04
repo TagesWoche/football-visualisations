@@ -136,6 +136,7 @@ class @SoccerMap extends RaphaelMap
     @setupPopups()
   
   updateInfo: ->
+    #console.log(@scene.score)
     $("#scene-result .score").html(@scene.score)
     $("#scene-result .left span").html("FCB")
     $("#scene-result .right span").html(@scene.opponent.toUpperCase()) if @scene.opponent
@@ -197,13 +198,43 @@ class @SoccerMap extends RaphaelMap
       desc.append("<span>Assist: <strong>#{ @scene.assist }</strong></span>")
        
   setupPopups: ->
-    $(".player").hover (event) ->
-      $this = $(@)
-      playerStatistics = tageswoche.tableData.getStatisticsForPopup()
-      playerStats = _.find(playerStatistics.list, (player) ->
-        player.nickname == $this.attr("data-playername")
-      )
-      # TODO: draw the popup
+    $(".player-number").hover (event) =>
+      $elem = $(event.currentTarget)
+      $($elem.prev()).tooltip("show")
+    , (event) =>
+      $elem = $(event.currentTarget)
+      $($elem.prev()).tooltip("hide")
+    # $(".player, .player-number").hover( (event) =>
+    #   $elem = $(event.currentTarget)
+    #   playerStatistics = tageswoche.tableData.getStatisticsForPopup()
+    #   playerStats = _.find(playerStatistics.list, (player) ->
+    #     player.nickname == $elem.attr("data-playername")
+    #   )
+    #   @showPopup(playerStats, $elem)
+    # , (event) =>
+    #   $elem = $(event.currentTarget)
+    #   if $elem.attr("class") == "player-number"
+    #     false
+    #     #console.log($elem)
+    #     #$elem.tooltip("hide")
+    #   if $elem.attr("class") == "player"
+    #     false
+    #     #console.log($elem)
+    #     #$($elem.prev()).tooltip("hide")
+    #   #console.log("hover out")
+    # )
+    $(".player, .player-number").tooltip()
+        
+  showPopup: (playerStats, $elem) ->
+    #if !@popupVisible
+    #console.log($elem.attr("class"))
+    if $elem.attr("class") == "player"
+      #console.log($($elem.next()))
+      $($elem.next()).tooltip( { title: playerStats.name } )
+      $($elem.next()).tooltip("show")
+    else if $elem.attr("class") == "player-number"
+      $elem.tooltip( { title: playerStats.name } )
+      #@popupVisible = true
        
   drawPasses: ->
     lastPosition = undefined
@@ -247,9 +278,11 @@ class @SoccerMap extends RaphaelMap
       # player position
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
-      $circle.attr("data-playername", action.name)
+      $circle.attr("data-playername", action.fullname)
+      $circle.attr("rel", "tooltip")
       $circle.attr("class", "player")
-      @label(player, action.number) if action.number
+      $circle.attr("title", action.fullname)
+      @label(player, action.number, action.fullname) if action.number
         
   
   drawSprint: (start, end) ->
@@ -307,13 +340,14 @@ class @SoccerMap extends RaphaelMap
       @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth, opacity: opacity })
       
     
-  label: (position, label) ->
+  label: (position, label, name) ->
     
     # small text placement correction for 10 and upwards...
     x = position.x
     if +label > 9 && +label < 20
       x -= 1
       
-    @map.text(x, position.y, label).attr(@numberTextAttributes)
-    
+    text = @map.text(x, position.y, label).attr(@numberTextAttributes)
+    $text = jQuery(text.node)
+    $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", name)#.attr("title", name)
     

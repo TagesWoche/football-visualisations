@@ -1154,7 +1154,6 @@
         });
         $("#stats").on("click", "th", function(event) {
           var $this;
-          console.log("hey");
           $this = $(event.currentTarget);
           $("#stats th").removeClass("active");
           return $this.addClass("active");

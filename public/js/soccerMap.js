@@ -240,14 +240,30 @@
     };
 
     SoccerMap.prototype.setupPopups = function() {
-      return $(".player").hover(function(event) {
-        var $this, playerStatistics, playerStats;
-        $this = $(this);
-        playerStatistics = tageswoche.tableData.getStatisticsForPopup();
-        return playerStats = _.find(playerStatistics.list, function(player) {
-          return player.nickname === $this.attr("data-playername");
-        });
+      var _this = this;
+      $(".player-number").hover(function(event) {
+        var $elem;
+        $elem = $(event.currentTarget);
+        return $($elem.prev()).tooltip("show");
+      }, function(event) {
+        var $elem;
+        $elem = $(event.currentTarget);
+        return $($elem.prev()).tooltip("hide");
       });
+      return $(".player, .player-number").tooltip();
+    };
+
+    SoccerMap.prototype.showPopup = function(playerStats, $elem) {
+      if ($elem.attr("class") === "player") {
+        $($elem.next()).tooltip({
+          title: playerStats.name
+        });
+        return $($elem.next()).tooltip("show");
+      } else if ($elem.attr("class") === "player-number") {
+        return $elem.tooltip({
+          title: playerStats.name
+        });
+      }
     };
 
     SoccerMap.prototype.drawPasses = function() {
@@ -292,10 +308,12 @@
         }
         circle = this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
         $circle = jQuery(circle.node);
-        $circle.attr("data-playername", action.name);
+        $circle.attr("data-playername", action.fullname);
+        $circle.attr("rel", "tooltip");
         $circle.attr("class", "player");
+        $circle.attr("title", action.fullname);
         if (action.number) {
-          _results.push(this.label(player, action.number));
+          _results.push(this.label(player, action.number, action.fullname));
         } else {
           _results.push(void 0);
         }
@@ -405,13 +423,15 @@
       }
     };
 
-    SoccerMap.prototype.label = function(position, label) {
-      var x;
+    SoccerMap.prototype.label = function(position, label, name) {
+      var $text, text, x;
       x = position.x;
       if (+label > 9 && +label < 20) {
         x -= 1;
       }
-      return this.map.text(x, position.y, label).attr(this.numberTextAttributes);
+      text = this.map.text(x, position.y, label).attr(this.numberTextAttributes);
+      $text = jQuery(text.node);
+      return $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", name);
     };
 
     return SoccerMap;

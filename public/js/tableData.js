@@ -84,7 +84,6 @@
         }));
         _.each($(".scoresList"), function(playerEntry, idx) {
           var $playerEntry, gameNames, playerScores;
-          console.log(_this.data.list[idx].scores);
           $playerEntry = $(playerEntry);
           playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
             return scoreEntry.scores.reverse();

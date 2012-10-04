@@ -62,7 +62,6 @@ tageswoche.tableData = do ->
   showScenesTable: () ->
     $("#stats").html(templates.tableScenes({ players : @data.list }))  
     _.each($(".scoresList"), (playerEntry, idx) =>
-      console.log(@data.list[idx].scores)
       $playerEntry = $(playerEntry)
       playerScores = _.chain(@data.list[idx].scores)
                         .map((scoreEntry) ->
