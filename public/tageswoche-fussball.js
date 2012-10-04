@@ -510,13 +510,15 @@
     data = tageswoche.data;
 
     function SoccerMap(container, settings) {
-      var height, self, width;
+      var height, self, width,
+        _this = this;
+      this.container = container;
       this.settings = settings != null ? settings : {};
       self = this;
       width = $("#scenes").width();
       field.scale = width / field.originalWidth;
       height = width / field.widthHeightRelation;
-      SoccerMap.__super__.constructor.call(this, container, width, height);
+      SoccerMap.__super__.constructor.call(this, this.container, width, height);
       this.scene = void 0;
       this.actions = [];
       this.black = "#555555";
@@ -547,7 +549,19 @@
       this.shadowOpacity = 0.5;
       this.initEvents();
       this.firstScene();
+      $(window).resize(function(event) {
+        return _this.redrawField();
+      });
     }
+
+    SoccerMap.prototype.redrawField = function() {
+      var height, width;
+      width = $("#scenes").width();
+      field.scale = width / field.originalWidth;
+      height = width / field.widthHeightRelation;
+      this.map.setSize(width, height);
+      return this.draw();
+    };
 
     SoccerMap.prototype.firstScene = function() {
       var _this = this;
@@ -730,14 +744,30 @@
     };
 
     SoccerMap.prototype.setupPopups = function() {
-      return $(".player").hover(function(event) {
-        var $this, playerStatistics, playerStats;
-        $this = $(this);
-        playerStatistics = tageswoche.tableData.getStatisticsForPopup();
-        return playerStats = _.find(playerStatistics.list, function(player) {
-          return player.nickname === $this.attr("data-playername");
-        });
+      var _this = this;
+      $(".player-number").hover(function(event) {
+        var $elem;
+        $elem = $(event.currentTarget);
+        return $($elem.prev()).tooltip("show");
+      }, function(event) {
+        var $elem;
+        $elem = $(event.currentTarget);
+        return $($elem.prev()).tooltip("hide");
       });
+      return $(".player, .player-number").tooltip();
+    };
+
+    SoccerMap.prototype.showPopup = function(playerStats, $elem) {
+      if ($elem.attr("class") === "player") {
+        $($elem.next()).tooltip({
+          title: playerStats.name
+        });
+        return $($elem.next()).tooltip("show");
+      } else if ($elem.attr("class") === "player-number") {
+        return $elem.tooltip({
+          title: playerStats.name
+        });
+      }
     };
 
     SoccerMap.prototype.drawPasses = function() {
@@ -782,10 +812,12 @@
         }
         circle = this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
         $circle = jQuery(circle.node);
-        $circle.attr("data-playername", action.name);
+        $circle.attr("data-playername", action.fullname);
+        $circle.attr("rel", "tooltip");
         $circle.attr("class", "player");
+        $circle.attr("title", action.fullname);
         if (action.number) {
-          _results.push(this.label(player, action.number));
+          _results.push(this.label(player, action.number, action.fullname));
         } else {
           _results.push(void 0);
         }
@@ -895,13 +927,15 @@
       }
     };
 
-    SoccerMap.prototype.label = function(position, label) {
-      var x;
+    SoccerMap.prototype.label = function(position, label, name) {
+      var $text, text, x;
       x = position.x;
       if (+label > 9 && +label < 20) {
         x -= 1;
       }
-      return this.map.text(x, position.y, label).attr(this.numberTextAttributes);
+      text = this.map.text(x, position.y, label).attr(this.numberTextAttributes);
+      $text = jQuery(text.node);
+      return $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", name);
     };
 
     return SoccerMap;
@@ -912,7 +946,7 @@
 
   this.tageswoche.templates = (function() {
     return {
-      table: _.template("<table id=\"player-table\">\n  <colgroup>\n    <col class=\"col-player\">\n    <col class=\"col-position\">\n    <col class=\"col-games\">\n    <col class=\"col-minutes\">\n    <col class=\"col-grade\">\n    <col class=\"col-goals\">\n    <col class=\"col-assists\">\n    <col class=\"col-yellow\" align=\"center\">\n    <col class=\"col-yellow-red\" align=\"center\">\n    <col class=\"col-red\" align=\"center\">\n  </colgroup>\n  <thead>\n    <tr>\n      <th>Spieler</th>\n      <th class=\"headerSortDown\">Position*</th>\n      <th>Einsätze</th>\n      <th>Minuten</th>\n      <th>&oslash; Bewertung</th>\n      <th>Tore</th>\n      <th>Assists</th>\n      <th>Gelbe</th>\n      <th>Gelb-Rote</th>\n      <th>Rote</th>\n    </tr>\n  </thead>\n  <tbody>\n    <% _.each(players, function(player) { %>\n      <tr>\n        <td><%= player.name %></td>\n        <td class=\"center td-position\"><%= player.position %></td>\n        <td class=\"center games-table\"><%= player.played %></td>\n        <td class=\"center games-table\"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>\n        <td class=\"center games-table\"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>\n        <td class=\"center scenes-table\"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>\n        <td class=\"center scenes-table\"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>\n        <td class=\"center\"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>\n        <td class=\"center\"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>\n        <td class=\"center\"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>\n      </tr>\n    <% }); %>\n  </tbody>\n  <tbody style=\"font-weight:bold;text-align:center\">\n    <tr>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n    </tr>\n    <tr>\n      <% sum = tageswoche.tableData.totals( players ) %>\n      <td>Total</td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td><%= sum.averageGrade %></td>\n      <td><%= sum.goals %></td>\n      <td><%= sum.assists %></td>\n      <td><%= sum.yellowCards %></td>\n      <td><%= sum.yellowRedCards %></td>\n      <td><%= sum.redCards %></td>\n    </tr>\n  </tbody>\n</table>\n<br/>\n<small class=\"legend\">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>"),
+      table: _.template("<table id=\"player-table\">\n  <colgroup>\n    <col class=\"col-player\">\n    <col class=\"col-position\">\n    <col class=\"col-games\">\n    <col class=\"col-minutes\">\n    <col class=\"col-grade\">\n    <col class=\"col-goals\">\n    <col class=\"col-assists\">\n    <col class=\"col-yellow\" align=\"center\">\n    <col class=\"col-yellow-red\" align=\"center\">\n    <col class=\"col-red\" align=\"center\">\n  </colgroup>\n  <thead>\n    <tr>\n      <th>Spieler</th>\n      <th class=\"headerSortDown\">Position*</th>\n      <th>Einsätze</th>\n      <th>Minuten</th>\n      <th>&oslash; Bewertung</th>\n      <th>Tore</th>\n      <th>Assists</th>\n      <th class=\"hide-mobile\">Gelbe</th>\n      <th class=\"hide-mobile\">Gelb-Rote</th>\n      <th class=\"hide-mobile\">Rote</th>\n    </tr>\n  </thead>\n  <tbody>\n    <% _.each(players, function(player) { %>\n      <tr>\n        <td><%= player.name %></td>\n        <td class=\"center td-position\"><%= player.position %></td>\n        <td class=\"center games-table\"><%= player.played %></td>\n        <td class=\"center games-table\"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>\n        <td class=\"center games-table\"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>\n        <td class=\"center scenes-table\"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>\n        <td class=\"center scenes-table\"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>\n        <td class=\"hide-mobile center\"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>\n        <td class=\"hide-mobile center\"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>\n        <td class=\"hide-mobile center\"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>\n      </tr>\n    <% }); %>\n  </tbody>\n  <tbody style=\"font-weight:bold;text-align:center\">\n    <tr>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td class=\"hide-mobile\"></td>\n      <td class=\"hide-mobile\"></td>\n      <td class=\"hide-mobile\"></td>\n    </tr>\n    <tr>\n      <% sum = tageswoche.tableData.totals( players ) %>\n      <td>Total</td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td><%= sum.averageGrade %></td>\n      <td><%= sum.goals %></td>\n      <td><%= sum.assists %></td>\n      <td class=\"hide-mobile\"><%= sum.yellowCards %></td>\n      <td class=\"hide-mobile\"><%= sum.yellowRedCards %></td>\n      <td class=\"hide-mobile\"><%= sum.redCards %></td>\n    </tr>\n  </tbody>\n</table>\n<br/>\n<small class=\"legend\">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>"),
       tableGames: _.template("<table id=\"player-table\">\n  <colgroup>\n    <col class=\"col-player\">\n    <col class=\"col-position\">\n    <col class=\"col-games\">\n    <col class=\"col-minutes\">\n    <col class=\"col-grade\">\n    <col class=\"col-graph\">\n  </colgroup>\n  <thead>\n    <tr>\n      <th>Spieler</th>\n      <th class=\"headerSortDown\">Position*</th>\n      <th>Einsätze</th>\n      <th>Minuten</th>\n      <th>&oslash; Bewertung</th>\n      <th class=\"graph-column\">Bewertung letzte Spiele</th>\n    </tr>\n  </thead>\n  <tbody>\n    <% _.each(players, function(player) { %>\n      <tr>\n        <td><%= player.name %></td>\n        <td class=\"center td-position\"><%= player.position %></td>\n        <td class=\"center top-table\"><%= player.played %></td>\n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>\n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>\n        <td class=\"gradesList bar graph graph-column\"> \n        </td>\n      </tr>\n    <% }); %>\n  </tbody>\n  <tbody style=\"font-weight:bold;text-align:center\">\n    <tr>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td class=\"graph-column\"></td>\n    </tr>\n    <tr>\n      <td>Total</td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td><%= sum.averageGrade %></td>\n      <td class=\"bar graph graph-column\" id=\"totalGrades\" style=\"text-align: left\">\n      </td>\n    </tr>\n  </tbody>\n</table>\n<br/>\n<small class=\"legend\">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>"),
       tableScenes: _.template("<table id=\"player-table\">\n  <colgroup>\n    <col class=\"col-player\">\n    <col class=\"col-games\">\n    <col class=\"col-goals\">\n    <col class=\"col-assists\">\n    <col class=\"col-scores\">\n    <col class=\"col-scoresperminute\">\n    <col class=\"col-graph\">\n  </colgroup>\n  <thead>\n    <tr>\n      <th>Spieler</th>\n      <th>Einsätze</th>\n      <th>Tore</th>\n      <th>Assists</th>\n      <th>Scorerpunkte*</th>\n      <th>Minuten pro Scorerpunkt</th>\n      <th class=\"graph-column\">Letzte Spiele</th>\n    </tr>\n  </thead>\n  <tbody>\n    <% _.each(players, function(player) { %>\n      <tr>\n        <td><%= player.name %></td>\n        <td class=\"center games-table\"><%= player.played %></td>\n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>\n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>\n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>  \n        <td class=\"center top-table\"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>\n        <td class=\"scoresList bar graph graph-column\"></td>\n      </tr>\n    <% }); %>\n  </tbody>\n  <tbody style=\"font-weight:bold;text-align:center\">\n    <tr>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td></td>\n      <td class=\"graph-column\"></td>\n    </tr>\n    <tr>\n      <% sum = tageswoche.tableData.totals( players ) %>\n      <td>Total</td>\n      <td></td>\n      <td><%= sum.goals %></td>\n      <td><%= sum.assists %></td>\n      <td><%= sum.goals + sum.assists %></td>\n      <td><%= tageswoche.tableData.aboveNullRounded(sum.minutes / (sum.goals + sum.assists)) %></td>\n      <td class=\"bar graph graph-column\" id=\"totalScores\" style=\"text-align: left\">\n      </td>\n    </tr>\n  </tbody>\n</table>\n<br>\n<small class=\"legend\">* Tore und Assists zusammengezählt</small>")
     };
@@ -1003,7 +1037,7 @@
           var $playerEntry, gameNames, playerScores;
           $playerEntry = $(playerEntry);
           playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
-            return scoreEntry.scores;
+            return scoreEntry.scores.reverse();
           }).last(_this.limit).value();
           gameNames = _.chain(_this.data.list[0].scores).map(function(gradeEntry) {
             return gradeEntry.opponent;
