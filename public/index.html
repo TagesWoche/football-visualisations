@@ -2,6 +2,8 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content = "width = device-width, initial-scale = 1, minimum-scale = 1, maximum-scale = 2" /> 
+    
     <title>Tageswoche - Spielszenen</title>
     
     <link href="css/spielszenen.css" rel="stylesheet">
@@ -63,27 +65,23 @@
       </div>
       
       <!-- scenes -->
-      <div id="scene-result">
+      <div id="scene-result" class="clearfix">
         <div class="left"><span></span><a href="" id="prev-game"></a></div>
         <div class="score"></div>
         <div class="right"><span></span><a href="" id="next-game"></a></div>
       </div>
-      <div id="scene-controls">
-        <a href="" id="prev-scene"><i></i> vorherige</a>
+      <div id="scene-controls" class="clearfix">
+        <a href="" id="prev-scene"><i></i><span class="hide-mobile"> vorherige</span></a>
         <ul id="scene-list">
           <li></li>
           <li></li>
           <li></li>
         </ul>
-        <a href="" id="next-scene">nächste <i></i></a>
+        <a href="" id="next-scene"><span class="hide-mobile">nächste </span><i></i></a>
       </div>
-      <div id="scenes" class="clear"></div>
+      <div id="scenes"></div>
       <div id="scene-desc"></div>
     </div>
-    
-
-    
-    
   
   <script>
   jQuery(document).ready(function() {
