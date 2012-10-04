@@ -19,7 +19,6 @@ body {
 
 #scene-result {
   margin: 3px 0;
-  height: 30px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -306,6 +305,38 @@ body {
   padding: 0 0 20px;
   font-size: 12px;
 }
+
 .clear {
   clear: both;
+}
+
+.clearfix { *zoom: 1; }
+.clearfix:after { clear: both; }
+
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  line-height: 0;
+  content: "";
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+
+  .hide-mobile { display: none; }
+  
+  #prev-scene,
+  #next-scene {
+    width: 25px;
+  }
+  
+  #prev-scene { padding: 0 0 0 5px; }
+  #next-scene { padding: 0 5px 0 0; }
+  
+  #scene-result .score { font-size: 20px; width: 18%; }
+  #scene-result .left, #scene-result .right  { width: 41%; }
+  
+  #prev-game { left: 0; }
+  #next-game { right: 0; }
+  
 }

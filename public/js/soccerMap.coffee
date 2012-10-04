@@ -4,12 +4,12 @@ class @SoccerMap extends RaphaelMap
   field = tageswoche.field
   data = tageswoche.data
   
-  constructor: (container, @settings = {}) ->
+  constructor: (@container, @settings = {}) ->
     self = this
-    width = $("#scenes").width();
+    width = $("#scenes").width()
     field.scale = width / field.originalWidth
     height = width / field.widthHeightRelation
-    super(container, width, height)
+    super(@container, width, height)
     
     @scene = undefined
     @actions = []
@@ -49,6 +49,21 @@ class @SoccerMap extends RaphaelMap
     @initEvents()  
     @firstScene()
 
+    # listen to resize events
+    $(window).resize (event) =>
+      @redrawField()
+      
+  redrawField: () ->
+    width = $("#scenes").width()
+    field.scale = width / field.originalWidth
+    height = width / field.widthHeightRelation
+    
+    # resize current map
+    @map.setSize(width, height)
+    
+    # create new one
+    @draw()
+  
   firstScene: () ->
     data.loadScenes (error, scenes) =>
       @scene = data.firstScene()

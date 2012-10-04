@@ -26,9 +26,9 @@
           <th>&oslash; Bewertung</th>
           <th>Tore</th>
           <th>Assists</th>
-          <th>Gelbe</th>
-          <th>Gelb-Rote</th>
-          <th>Rote</th>
+          <th class="hide-mobile">Gelbe</th>
+          <th class="hide-mobile">Gelb-Rote</th>
+          <th class="hide-mobile">Rote</th>
         </tr>
       </thead>
       <tbody>
@@ -41,9 +41,9 @@
             <td class="center games-table"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
             <td class="center scenes-table"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
             <td class="center scenes-table"><%= tageswoche.tableData.aboveNull( player.assists ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>
-            <td class="center"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>
+            <td class="hide-mobile center"><%= tageswoche.tableData.aboveNull( player.yellowCards ) %></td>
+            <td class="hide-mobile center"><%= tageswoche.tableData.aboveNull( player.yellowRedCards ) %></td>
+            <td class="hide-mobile center"><%= tageswoche.tableData.aboveNull( player.redCards ) %></td>
           </tr>
         <% }); %>
       </tbody>
@@ -56,9 +56,9 @@
           <td></td>
           <td></td>
           <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td class="hide-mobile"></td>
+          <td class="hide-mobile"></td>
+          <td class="hide-mobile"></td>
         </tr>
         <tr>
           <% sum = tageswoche.tableData.totals( players ) %>
@@ -69,9 +69,9 @@
           <td><%= sum.averageGrade %></td>
           <td><%= sum.goals %></td>
           <td><%= sum.assists %></td>
-          <td><%= sum.yellowCards %></td>
-          <td><%= sum.yellowRedCards %></td>
-          <td><%= sum.redCards %></td>
+          <td class="hide-mobile"><%= sum.yellowCards %></td>
+          <td class="hide-mobile"><%= sum.yellowRedCards %></td>
+          <td class="hide-mobile"><%= sum.redCards %></td>
         </tr>
       </tbody>
     </table>

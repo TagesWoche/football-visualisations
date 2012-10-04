@@ -20,13 +20,15 @@
     data = tageswoche.data;
 
     function SoccerMap(container, settings) {
-      var height, self, width;
+      var height, self, width,
+        _this = this;
+      this.container = container;
       this.settings = settings != null ? settings : {};
       self = this;
       width = $("#scenes").width();
       field.scale = width / field.originalWidth;
       height = width / field.widthHeightRelation;
-      SoccerMap.__super__.constructor.call(this, container, width, height);
+      SoccerMap.__super__.constructor.call(this, this.container, width, height);
       this.scene = void 0;
       this.actions = [];
       this.black = "#555555";
@@ -57,7 +59,19 @@
       this.shadowOpacity = 0.5;
       this.initEvents();
       this.firstScene();
+      $(window).resize(function(event) {
+        return _this.redrawField();
+      });
     }
+
+    SoccerMap.prototype.redrawField = function() {
+      var height, width;
+      width = $("#scenes").width();
+      field.scale = width / field.originalWidth;
+      height = width / field.widthHeightRelation;
+      this.map.setSize(width, height);
+      return this.draw();
+    };
 
     SoccerMap.prototype.firstScene = function() {
       var _this = this;
