@@ -968,12 +968,22 @@
         this.prepareTablesorter();
         this.initEvents();
         this.loadStatistics(this.filter, $.proxy(this.redrawTable, this));
-        return $("#location-filter").on("change", function(event) {
-          var $this;
+        $("#location-filter").on("change", function(event) {
+          var $this, _ref;
           $this = $(event.currentTarget);
-          _this.filter = {
-            location: $this.val()
-          };
+          if ((_ref = _this.filter) == null) {
+            _this.filter = {};
+          }
+          _this.filter.location = $this.val();
+          return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
+        });
+        return $("#competition-filter").on("change", function(event) {
+          var $this, _ref;
+          $this = $(event.currentTarget);
+          if ((_ref = _this.filter) == null) {
+            _this.filter = {};
+          }
+          _this.filter.competition = $this.val();
           return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
         });
       },
@@ -991,8 +1001,8 @@
         if (filter.location) {
           filterString += "location=" + filter.location + "&";
         }
-        if (filter.game) {
-          filterString += "game=" + filter.game;
+        if (filter.competition) {
+          filterString += "competition=" + filter.competition;
         }
         if (filterString === "") {
           filterString = "all";

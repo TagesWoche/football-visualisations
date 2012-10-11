@@ -15,8 +15,16 @@ tageswoche.tableData = do ->
       
     $("#location-filter").on "change", (event) =>
       $this = $(event.currentTarget)
-      @filter = { location: $this.val() }
+      @filter ?= {}
+      @filter.location = $this.val()
       @loadStatistics(@filter, $.proxy(@redrawTable, @))
+      
+    $("#competition-filter").on "change", (event) =>
+      $this = $(event.currentTarget)
+      @filter ?= {}
+      @filter.competition = $this.val()
+      @loadStatistics(@filter, $.proxy(@redrawTable, @))
+      
           
   redrawTable: (data) ->
     @data = data
@@ -28,7 +36,8 @@ tageswoche.tableData = do ->
   loadStatistics: (filter, callback) ->
     filterString = ""
     if filter.location then filterString += "location=#{filter.location}&"
-    if filter.game then filterString += "game=#{filter.game}"
+    if filter.competition then filterString += "competition=#{filter.competition}"
+    #if filter.game then filterString += "game=#{filter.game}"
     if filterString == "" then filterString = "all"
     # console.log("Filter is #{filterString}")
     

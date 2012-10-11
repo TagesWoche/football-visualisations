@@ -325,6 +325,7 @@ body {
 
   .hide-mobile { display: none; }
   
+  #table-filter { margin-top: 10px; float: left; }
   #prev-scene,
   #next-scene {
     width: 25px;
