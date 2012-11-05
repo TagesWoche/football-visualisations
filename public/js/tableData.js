@@ -96,7 +96,7 @@
           var $playerEntry, gameNames, playerScores;
           $playerEntry = $(playerEntry);
           playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
-            return scoreEntry.scores.reverse();
+            return scoreEntry.scores;
           }).last(_this.limit).value();
           gameNames = _.chain(_this.data.list[0].scores).map(function(gradeEntry) {
             return gradeEntry.opponent;

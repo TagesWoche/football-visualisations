@@ -74,7 +74,7 @@ tageswoche.tableData = do ->
       $playerEntry = $(playerEntry)
       playerScores = _.chain(@data.list[idx].scores)
                         .map((scoreEntry) ->
-                          scoreEntry.scores.reverse()
+                          scoreEntry.scores
                         )
                         .last(@limit)
                         .value()
