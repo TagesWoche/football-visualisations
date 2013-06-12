@@ -26,13 +26,22 @@
           _this.filter.location = $this.val();
           return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
         });
-        return $("#competition-filter").on("change", function(event) {
+        $("#competition-filter").on("change", function(event) {
           var $this, _ref;
           $this = $(event.currentTarget);
           if ((_ref = _this.filter) == null) {
             _this.filter = {};
           }
           _this.filter.competition = $this.val();
+          return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
+        });
+        return $("#saison-filter").on("change", function(event) {
+          var $this, _ref;
+          $this = $(event.currentTarget);
+          if ((_ref = _this.filter) == null) {
+            _this.filter = {};
+          }
+          _this.filter.saison = $this.val();
           return _this.loadStatistics(_this.filter, $.proxy(_this.redrawTable, _this));
         });
       },
@@ -52,6 +61,9 @@
         }
         if (filter.competition) {
           filterString += "competition=" + filter.competition;
+        }
+        if (filter.saison) {
+          filterString += "saison=" + filter.saison;
         }
         if (filterString === "") {
           filterString = "all";
