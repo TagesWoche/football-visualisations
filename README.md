@@ -16,3 +16,9 @@ All columns can be sorted
 
 ### Scorecards
 see separate repo
+
+### Screenshots
+
+![Scenes](https://raw.github.com/TagesWoche/tageswoche-fussball/master/screenshot-scenes.png)
+
+![Table](https://raw.github.com/TagesWoche/tageswoche-fussball/master/screenshot-table.png)
