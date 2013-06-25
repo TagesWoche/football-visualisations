@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Tageswoche - Statistiken</title>
+    
+    <link href="css/spielszenen.css" rel="stylesheet">
+    
+    <script src="js/vendor/jquery-1.7.2.min.js"></script>
+    <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/underscore.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/tableData.js"></script>
+    <!-- <script src="js/vendor/jquery.tablesorter.js"></script>-->
+    <script src="js/vendor/jquery.tablesorter.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="table-container">
+
+        <div id="table-nav">
+          <ul>
+            <li><a href="" class="top-table active">&Uuml;bersicht</a></li>
+            <li><a href="" class="games-table">Bewertungen</a></li>
+            <li><a href="" class="scenes-table">Tore</a></li>
+          </ul>
+
+          <div id="table-filter">
+            <form>
+            <span class="hide-mobile">Filter:</span>
+            <select name="location" id="location-filter">
+            	<option value="">Alle Spiele</option>
+            	<option value="home">Heimspiele</option>
+            	<option value="out">Auswärtsspiele</option>
+            </select>
+            <select name="competition" id="competition-filter">
+            	<option value="">Alle Wettbewerbe</option>
+            	<option value="m">Meisterschaft</option>
+            	<option value="c">Cup</option>
+            	<option value="euro">International</option>
+            </select>
+            <select name="saison" id="saison-filter">
+              <option value="12/13">12/13</option>
+              <option value="13/14">13/14</option>
+            </select>
+            </form>
+          </div>
+          <div class="clear"></div>
+        </div>
+
+        <div id="stats">
+          <div class="loading">loading...</div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+    $(document).ready(function() {
+      tageswoche.tableData.init();
+    });
+    </script>
+  </body>
+</html>
