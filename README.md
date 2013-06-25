@@ -19,6 +19,8 @@ see separate repo
 
 ### Screenshots
 
+Live: http://labs.tageswoche.ch/fussball-viz/public/spielszenen.html
 ![Scenes](https://raw.github.com/TagesWoche/tageswoche-fussball/master/screenshot-scenes.png)
 
+Live: http://labs.tageswoche.ch/fussball-viz/public/statistik.html
 ![Table](https://raw.github.com/TagesWoche/tageswoche-fussball/master/screenshot-table.png)
