@@ -219,7 +219,7 @@
           } else if (goalAction.directFreeKick) {
             this.scene.goal = "" + this.scene.goal + " (Freistoss direkt)";
           } else if (goalAction.indirectFreeKick) {
-            this.scene.goal = "" + this.scene.goal + " (Freistoss indirekt)";
+            this.scene.goal = "" + this.scene.goal + " (Freistoss)";
           }
           if (length > 1) {
             assistAction = this.actions[length - 2];

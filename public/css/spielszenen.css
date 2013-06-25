@@ -6,7 +6,7 @@ body {
 /* SPIELSZENE */
 #container {
   margin: 20px auto 40px;
-  max-width: 648px;
+  max-width: 990px;
 }
 
 #scenes {
@@ -74,6 +74,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  margin-bottom: 10px;
 }
 
 #prev-scene,
@@ -143,6 +144,10 @@ body {
 
 #scene-desc {
   font-size: 12px;
+  font-weight: bold;
+  margin-bottom: -20px;
+  text-align: center;
+  color: white;
 }
 
 #scene-desc em {
@@ -339,5 +344,18 @@ body {
   
   #prev-game { left: 0; }
   #next-game { right: 0; }
+  
+  
+}
+
+@media (max-width: 420px) {
+
+  #scene-controls {margin-bottom: 0px;}
+  
+  #scene-desc {
+	  margin-bottom: 0px;
+	  color:black;
+	  font-weight: normal;
+  }  
   
 }
