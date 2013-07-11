@@ -18,8 +18,15 @@
       scenes: void 0,
       games: {},
       current: -1,
-      getStartDate: function(date) {
-        return date = '2013-05-12';
+      getStartDate: function() {
+        return this.getUrlParameter('date');
+      },
+      getUrlParameter: function(name) {
+        var value, _ref;
+        value = (_ref = RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)) != null ? _ref[1] : void 0;
+        if (value) {
+          return decodeURI(value);
+        }
       },
       formatDate: function(dateString) {
         var date, day, month, year;

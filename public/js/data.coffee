@@ -16,9 +16,14 @@ tageswoche.data = do ->
   games: {}
   current: -1
 
-  # param date format: 'yyyy-mm-dd'
-  getStartDate: (date) ->
-    date = '2013-05-12'
+  # param date format: 'yyyy-mm-dd' z.B. '2013-05-12'
+  getStartDate: () ->
+    @getUrlParameter('date')
+
+  getUrlParameter: (name) ->
+    value = RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)?[1]
+    decodeURI(value) if value
+
 
   formatDate: (dateString) ->
     date = new Date(dateString)
