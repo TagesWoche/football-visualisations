@@ -16,6 +16,19 @@ tageswoche.data = do ->
   games: {}
   current: -1
 
+  # param date format: 'yyyy-mm-dd'
+  getStartDate: (date) ->
+    date = '2013-05-12'
+
+  formatDate: (dateString) ->
+    date = new Date(dateString)
+    year = date.getFullYear()
+    month = date.getMonth() + 1
+    day = date.getDate()
+    month = "0#{ month }" if month < 10
+    day = "0#{ day }" if day < 10
+    "#{ year }-#{ month }-#{ day }"
+
   addSceneToGame: (scene) ->
     game = @games[scene.date] ?= []
     @scenes.push(scene)
@@ -26,6 +39,12 @@ tageswoche.data = do ->
     game = @games[lastScene.date]
     @current = game[0]
     @scenes[@current]
+
+  findScene: (date) ->
+    game = @games[date]
+    if game
+      @current = game[0]
+      @scenes[@current]
 
   nextScene: () ->
     @current += 1 if !@isLastScene()
@@ -91,7 +110,7 @@ tageswoche.data = do ->
             opponent: entry.opponent
             team: entry.team
             home: entry.homematch
-            date: entry.date
+            date: @formatDate(entry.date)
             competition: entry.competition
             scorePosition: entry.scorePosition
 

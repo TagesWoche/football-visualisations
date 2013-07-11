@@ -76,7 +76,11 @@
     SoccerMap.prototype.firstScene = function() {
       var _this = this;
       return data.loadScenes(function(error, scenes) {
-        _this.scene = data.firstScene();
+        var startDate;
+        if (startDate = data.getStartDate()) {
+          _this.scene = data.findScene(startDate);
+        }
+        _this.scene || (_this.scene = data.firstScene());
         return _this.draw();
       });
     };
@@ -219,7 +223,7 @@
           } else if (goalAction.directFreeKick) {
             this.scene.goal = "" + this.scene.goal + " (Freistoss direkt)";
           } else if (goalAction.indirectFreeKick) {
-            this.scene.goal = "" + this.scene.goal + " (Freistoss)";
+            this.scene.goal = "" + this.scene.goal + " (Freistoss indirekt)";
           }
           if (length > 1) {
             assistAction = this.actions[length - 2];

@@ -18,6 +18,23 @@
       scenes: void 0,
       games: {},
       current: -1,
+      getStartDate: function(date) {
+        return date = '2013-05-12';
+      },
+      formatDate: function(dateString) {
+        var date, day, month, year;
+        date = new Date(dateString);
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        day = date.getDate();
+        if (month < 10) {
+          month = "0" + month;
+        }
+        if (day < 10) {
+          day = "0" + day;
+        }
+        return "" + year + "-" + month + "-" + day;
+      },
       addSceneToGame: function(scene) {
         var game, _base, _name, _ref;
         game = (_ref = (_base = this.games)[_name = scene.date]) != null ? _ref : _base[_name] = [];
@@ -30,6 +47,14 @@
         game = this.games[lastScene.date];
         this.current = game[0];
         return this.scenes[this.current];
+      },
+      findScene: function(date) {
+        var game;
+        game = this.games[date];
+        if (game) {
+          this.current = game[0];
+          return this.scenes[this.current];
+        }
       },
       nextScene: function() {
         if (!this.isLastScene()) {
@@ -114,7 +139,7 @@
                 opponent: entry.opponent,
                 team: entry.team,
                 home: entry.homematch,
-                date: entry.date,
+                date: _this.formatDate(entry.date),
                 competition: entry.competition,
                 scorePosition: entry.scorePosition
               };
