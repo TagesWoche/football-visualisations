@@ -42,7 +42,7 @@ tageswoche.tableData = do ->
   loadStatistics: (filter, callback) ->
     filterString = ""
     if filter.location then filterString += "location=#{filter.location}&"
-    if filter.competition then filterString += "competition=#{filter.competition}"
+    if filter.competition then filterString += "competition=#{filter.competition}&"
     if filter.saison then filterString += "saison=#{filter.saison}"
     #if filter.game then filterString += "game=#{filter.game}"
     if filterString == "" then filterString = "all"

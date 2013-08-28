@@ -60,7 +60,7 @@
           filterString += "location=" + filter.location + "&";
         }
         if (filter.competition) {
-          filterString += "competition=" + filter.competition;
+          filterString += "competition=" + filter.competition + "&";
         }
         if (filter.saison) {
           filterString += "saison=" + filter.saison;
