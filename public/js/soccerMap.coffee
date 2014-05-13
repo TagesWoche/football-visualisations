@@ -152,7 +152,6 @@ class @SoccerMap extends RaphaelMap
     @updateInfo()
     @sceneInfo()
 
-    @setupPopups()
 
   updateInfo: ->
     #console.log(@scene.score)
@@ -216,44 +215,6 @@ class @SoccerMap extends RaphaelMap
     if @scene.assist
       desc.append("<span>Assist: <strong>#{ @scene.assist }</strong></span>")
 
-  setupPopups: ->
-    $(".player-number").hover (event) =>
-      $elem = $(event.currentTarget)
-      $($elem.prev()).tooltip("show")
-    , (event) =>
-      $elem = $(event.currentTarget)
-      $($elem.prev()).tooltip("hide")
-    # $(".player, .player-number").hover( (event) =>
-    #   $elem = $(event.currentTarget)
-    #   playerStatistics = tageswoche.tableData.getStatisticsForPopup()
-    #   playerStats = _.find(playerStatistics.list, (player) ->
-    #     player.nickname == $elem.attr("data-playername")
-    #   )
-    #   @showPopup(playerStats, $elem)
-    # , (event) =>
-    #   $elem = $(event.currentTarget)
-    #   if $elem.attr("class") == "player-number"
-    #     false
-    #     #console.log($elem)
-    #     #$elem.tooltip("hide")
-    #   if $elem.attr("class") == "player"
-    #     false
-    #     #console.log($elem)
-    #     #$($elem.prev()).tooltip("hide")
-    #   #console.log("hover out")
-    # )
-    $(".player, .player-number").tooltip()
-
-  showPopup: (playerStats, $elem) ->
-    #if !@popupVisible
-    #console.log($elem.attr("class"))
-    if $elem.attr("class") == "player"
-      #console.log($($elem.next()))
-      $($elem.next()).tooltip( { title: playerStats.name } )
-      $($elem.next()).tooltip("show")
-    else if $elem.attr("class") == "player-number"
-      $elem.tooltip( { title: playerStats.name } )
-      #@popupVisible = true
 
   drawPasses: ->
     lastPosition = undefined
@@ -297,7 +258,18 @@ class @SoccerMap extends RaphaelMap
       # player position
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
+      $circle.attr("data-toggle", "tooltip")
       $circle.attr("title", action.fullname || action.name)
+      $circle.tooltip
+        container: $('body')
+        trigger: 'hover'
+          # $text = jQuery(text.node)
+    # $text.addClass('player-number')
+    # $text.attr("data-toggle", "tooltip").attr("title", "test")
+    # $text.tooltip
+    #   container: $('body')
+
+
       @label {player, action}
 
 
@@ -366,13 +338,11 @@ class @SoccerMap extends RaphaelMap
         x -= 1
 
       text = @map.text(x, player.y, action.number).attr(@numberTextAttributes)
-    else
-      # this is a hack to write with the bg color
-      text = @map.text(player.x, player.y, 0).attr(@opponentAttributes)
-
-    # popover text
-    $text = jQuery(text.node)
-    $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", action.fullname || action.name)
-
-
+      $text = jQuery(text.node)
+      # Since the number lies above the circle, we need to add the tooltip here too
+      $text.attr("data-toggle", "tooltip").attr("title", "test")
+      $text.attr("title", action.fullname)
+      $text.tooltip
+        container: $('body')
+        trigger: 'hover'
 
