@@ -11,6 +11,7 @@ tageswoche.data = do ->
     "ps": "penaltyShootout"
     "ew": "throwIn"
     "f" : "foul"
+    "g" : "shot"
 
   scenes: undefined
   games: {}
@@ -106,6 +107,8 @@ tageswoche.data = do ->
 
           for action in entry.playerPositions
             if action.specialCondition
+              if action.specialCondition.toLowerCase() == 'g'
+                action.shotTarget = action.triedToScore?.toLowerCase()
               action[ specialConditionsAttr[ action.specialCondition.toLowerCase() ] ] = true
 
           scene =
