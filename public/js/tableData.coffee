@@ -54,6 +54,7 @@ tageswoche.tableData = do ->
     else
       $.ajax(
         url: "http://tageswoche.herokuapp.com/fcb/statistics?#{filterString}",
+        #url: "http://localhost:3000/fcb/statistics?#{filterString}",
         dataType: "jsonp"
       ).done ( data ) =>
         #console.log data
@@ -73,11 +74,11 @@ tageswoche.tableData = do ->
       when "scenes" then @showScenesTable()
 
   showTopTable: () ->
-    $("#stats").html(templates.table({ players : @data.list }))
+    $("#stats").html(templates.table({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
     @tablesorter()
 
   showScenesTable: () ->
-    $("#stats").html(templates.tableScenes({ players : @data.list }))
+    $("#stats").html(templates.tableScenes({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
     _.each($(".scoresList"), (playerEntry, idx) =>
       $playerEntry = $(playerEntry)
       playerScores = _.chain(@data.list[idx].scores)
@@ -108,7 +109,7 @@ tageswoche.tableData = do ->
     @tablesorter()
 
   showGamesTable: () ->
-    $("#stats").html(templates.tableGames({ players : @data.list }))
+    $("#stats").html(templates.tableGames({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
 
     totalValues = _.chain(@data.list[0].grades)
                     .map((gradeEntry) ->

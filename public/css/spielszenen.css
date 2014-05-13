@@ -162,6 +162,10 @@ body {
 
 /* TABLE */
 
+#stats {
+  position: relative;
+}
+
 /* navigation */
 #table-nav {
   border-bottom: 1px solid #ccc;
@@ -269,10 +273,10 @@ body {
 #player-table .col-games { background: #CCF0FF; border-right: 1px solid #A1C5D6; }
 #player-table .col-minutes { background: #CCF0FF; border-right: 1px solid #A1C5D6; }
 #player-table .col-grade { background: #CCF0FF; border-right: 1px solid #fff; }
-#player-table .col-goals { background: #E1EFD5; border-right: 1px solid #B5C5A8; } 
-#player-table .col-assists { background: #E1EFD5; border-right: 1px solid #fff; } 
-#player-table .col-scores { background: #E1EFD5; border-right: 1px solid #fff; } 
-#player-table .col-scoresperminute { background: #E1EFD5; border-right: 1px solid #fff; } 
+#player-table .col-goals { background: #E1EFD5; border-right: 1px solid #B5C5A8; }
+#player-table .col-assists { background: #E1EFD5; border-right: 1px solid #fff; }
+#player-table .col-scores { background: #E1EFD5; border-right: 1px solid #fff; }
+#player-table .col-scoresperminute { background: #E1EFD5; border-right: 1px solid #fff; }
 #player-table .col-yellow { background: #FFF2CC; border-right: 1px solid #E8DBAD; }
 #player-table .col-yellow-red { background: #FFF2CC; border-right: 1px solid #E8DBAD; } /* orange: FCE5CD */
 #player-table .col-red { background: #FFF2CC; border-right: 1px solid #fff; } /* red: F4CCCC */
@@ -292,6 +296,12 @@ body {
 .legend {
   font-size: 0.7em;
   color: #333;
+}
+
+.last-update {
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
 }
 
 #player-table td.graph {
@@ -329,33 +339,37 @@ body {
 @media (max-width: 767px) {
 
   .hide-mobile { display: none; }
-  
+
   #table-filter { margin-top: 10px; float: left; }
   #prev-scene,
   #next-scene {
     width: 25px;
   }
-  
+
   #prev-scene { padding: 0 0 0 5px; }
   #next-scene { padding: 0 5px 0 0; }
-  
+
   #scene-result .score { font-size: 20px; width: 18%; }
   #scene-result .left, #scene-result .right  { width: 41%; }
-  
+
   #prev-game { left: 0; }
   #next-game { right: 0; }
-  
-  
+
+
 }
 
 @media (max-width: 420px) {
 
+  .last-update {
+    bottom: 12px;
+  }
+
   #scene-controls {margin-bottom: 0px;}
-  
+
   #scene-desc {
 	  margin-bottom: 0px;
 	  color:black;
 	  font-weight: normal;
-  }  
-  
+  }
+
 }
