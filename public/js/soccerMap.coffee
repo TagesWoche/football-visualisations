@@ -297,11 +297,8 @@ class @SoccerMap extends RaphaelMap
       # player position
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)
-      $circle.attr("data-playername", action.fullname)
-      $circle.attr("rel", "tooltip")
-      $circle.attr("class", "player")
-      $circle.attr("title", action.fullname)
-      @label(player, action.number, action.fullname) if action.number
+      $circle.attr("title", action.fullname || action.name)
+      @label {player, action}
 
 
   drawSprint: (start, end) ->
@@ -359,14 +356,23 @@ class @SoccerMap extends RaphaelMap
       @map.path(arrowhead).attr({ fill:"", stroke: color, "stroke-width": strokeWidth, opacity: opacity })
 
 
-  label: (position, label, name) ->
+  label: ({player, action}) ->
+    x = player.x
 
-    # small text placement correction for 10 and upwards...
-    x = position.x
-    if +label > 9 && +label < 20
-      x -= 1
+    # Basel's player
+    if action.number?
+      # small text placement correction for 10 and upwards...
+      if +action.number > 9 && +action.number < 20
+        x -= 1
 
-    text = @map.text(x, position.y, label).attr(@numberTextAttributes)
+      text = @map.text(x, player.y, action.number).attr(@numberTextAttributes)
+    else
+      # this is a hack to write with the bg color
+      text = @map.text(player.x, player.y, 0).attr(@opponentAttributes)
+
+    # popover text
     $text = jQuery(text.node)
-    $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", name)#.attr("title", name)
+    $text.attr("rel", "tooltip").attr("class", "player-number").attr("data-playername", action.fullname || action.name)
+
+
 
