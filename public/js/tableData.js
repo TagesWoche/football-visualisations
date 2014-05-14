@@ -150,12 +150,13 @@
             return $playerEntry.sparkline(playerValues, {
               type: 'bar',
               tooltipFormatter: function(sparklines, options, fields) {
-                if (fields[0].value === 0) {
-                  return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
+                if (fields[0].value !== 0) {
+                  return "<div style=\"padding-right: 10px\">\n  Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + ". <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset] + "\n</div>";
                 } else {
-                  return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+                  return "";
                 }
               },
+              tooltipContainer: $('#stats'),
               height: 15,
               barWidth: 12,
               barSpacing: 2,

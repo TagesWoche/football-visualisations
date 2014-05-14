@@ -130,11 +130,15 @@ tageswoche.tableData = do ->
       $playerEntry.sparkline(playerValues,
         type: 'bar'
         tooltipFormatter: (sparklines, options, fields) ->
-          if fields[0].value == 0
-            "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+          if fields[0].value != 0
+            """
+              <div style="padding-right: 10px">
+                Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value}. <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}
+              </div>
+            """
           else
-            "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
-
+            ""
+        tooltipContainer: $('#stats')
         height: 15
         barWidth: 12
         barSpacing: 2
