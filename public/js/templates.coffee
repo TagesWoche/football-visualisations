@@ -1,7 +1,7 @@
 @tageswoche = @tageswoche || {}
 
 @tageswoche.templates = do ->
-  
+
   table: _.template(
     """
     <table id="player-table">
@@ -79,7 +79,7 @@
     <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
-  
+
   tableGames: _.template(
     """
     <table id="player-table">
@@ -109,7 +109,7 @@
             <td class="center top-table"><%= player.played %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNull( player.minutes ) %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.averageGrade ) %></td>
-            <td class="gradesList bar graph graph-column"> 
+            <td class="gradesList bar graph graph-column">
             </td>
           </tr>
         <% }); %>
@@ -138,7 +138,7 @@
     <small class="legend">* TW: Tor, VE: Verteidigung, MF: Mittelfeld, ST: Sturm</small>
     """
   )
-  
+
   tableScenes: _.template(
     """
     <table id="player-table">
@@ -159,7 +159,7 @@
           <th>Assists</th>
           <th>Scorerpunkte*</th>
           <th>Minuten pro Scorerpunkt</th>
-          <th class="graph-column">Letzte Spiele</th>
+          <th class="graph-column">Scorerpunkte letzte 10 Spiele</th>
         </tr>
       </thead>
       <tbody>
@@ -169,9 +169,9 @@
             <td class="center games-table"><%= player.played %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNull( player.goals ) %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>
-            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>  
+            <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>
-            <td class="scoresList bar graph graph-column"></td>
+            <td class="center top-table"><%= _.reduce(_.last(player.scores, 10), function(memo, entry){ return memo + +entry.scores[0] + +entry.scores[1] }, 0) %></td>
           </tr>
         <% }); %>
       </tbody>
@@ -202,4 +202,4 @@
     <small class="legend">* Tore und Assists zusammengezählt</small>
     """
   )
-  
+

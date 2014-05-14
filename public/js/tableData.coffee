@@ -76,36 +76,11 @@ tageswoche.tableData = do ->
     $("#stats").html(templates.table({ players : @data.list }))
     @tablesorter()
 
+
   showScenesTable: () ->
     $("#stats").html(templates.tableScenes({ players : @data.list }))
-    _.each($(".scoresList"), (playerEntry, idx) =>
-      $playerEntry = $(playerEntry)
-      playerScores = _.chain(@data.list[idx].scores)
-                        .map((scoreEntry) ->
-                          scoreEntry.scores
-                        )
-                        .last(@limit)
-                        .value()
-
-      gameNames =   _.chain(@data.list[0].scores)
-                      .map((gradeEntry) ->
-                          gradeEntry.opponent
-                      )
-                      .last(@limit)
-                      .value()
-
-      $playerEntry.sparkline(playerScores,
-        type: 'bar'
-        tooltipFormatter: (sparklines, options, fields) ->
-          "Gegner #{gameNames[fields[0].offset]}. <br/> Tore: #{fields[0].value}, Assists: #{fields[1].value}"
-        height: 15
-        barWidth: 12
-        barSpacing: 2
-
-      )
-    )
-
     @tablesorter()
+
 
   showGamesTable: () ->
     $("#stats").html(templates.tableGames({ players : @data.list }))
