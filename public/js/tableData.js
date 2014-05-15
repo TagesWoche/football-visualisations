@@ -100,13 +100,17 @@
       },
       showTopTable: function() {
         $("#stats").html(templates.table({
-          players: this.data.list
+          players: this.data.list,
+          lastUpdate: moment(this.data.lastUpdate),
+          season: this.data.season
         }));
         return this.tablesorter();
       },
       showScenesTable: function() {
         $("#stats").html(templates.tableScenes({
-          players: this.data.list
+          players: this.data.list,
+          lastUpdate: moment(this.data.lastUpdate),
+          season: this.data.season
         }));
         _.each($(".scoresList"), (function(_this) {
           return function(playerEntry, idx) {
@@ -134,7 +138,9 @@
       showGamesTable: function() {
         var gameNames, totalValues;
         $("#stats").html(templates.tableGames({
-          players: this.data.list
+          players: this.data.list,
+          lastUpdate: moment(this.data.lastUpdate),
+          season: this.data.season
         }));
         totalValues = _.chain(this.data.list[0].grades).map(function(gradeEntry) {
           return tageswoche.tableData.round(gradeEntry.gameAverageGrade);

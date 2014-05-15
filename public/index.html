@@ -28,6 +28,7 @@
 
     <script src="js/vendor/underscore.js"></script>
     <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/moment.min.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/tableData.js"></script>
 
@@ -94,13 +95,15 @@
       <div id="scenes"></div>
       <h4>Legende:</h4>
       <img src="img/legend.png" />
-
     </div>
 
   <script>
   jQuery(document).ready(function() {
     map = new SoccerMap("scenes");
     tageswoche.tableData.init();
+
+    // moment language
+    moment.lang('de');
   });
   </script>
   </body>
