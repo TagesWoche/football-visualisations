@@ -108,7 +108,9 @@
       },
       showScenesTable: function() {
         $("#stats").html(templates.tableScenes({
-          players: this.data.list
+          players: this.data.list,
+          lastUpdate: moment(this.data.lastUpdate),
+          season: this.data.season
         }));
         return this.tablesorter();
       },

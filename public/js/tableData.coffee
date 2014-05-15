@@ -79,7 +79,7 @@ tageswoche.tableData = do ->
 
 
   showScenesTable: () ->
-    $("#stats").html(templates.tableScenes({ players : @data.list }))
+    $("#stats").html(templates.tableScenes({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
     @tablesorter()
 
 
