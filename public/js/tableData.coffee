@@ -54,6 +54,7 @@ tageswoche.tableData = do ->
     else
       $.ajax(
         url: "http://tageswoche.herokuapp.com/fcb/statistics?#{filterString}",
+        #url: "http://localhost:3000/fcb/statistics?#{filterString}",
         dataType: "jsonp"
       ).done ( data ) =>
         #console.log data
@@ -73,7 +74,7 @@ tageswoche.tableData = do ->
       when "scenes" then @showScenesTable()
 
   showTopTable: () ->
-    $("#stats").html(templates.table({ players : @data.list }))
+    $("#stats").html(templates.table({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
     @tablesorter()
 
 
@@ -83,7 +84,7 @@ tageswoche.tableData = do ->
 
 
   showGamesTable: () ->
-    $("#stats").html(templates.tableGames({ players : @data.list }))
+    $("#stats").html(templates.tableGames({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
 
     totalValues = _.chain(@data.list[0].grades)
                     .map((gradeEntry) ->
@@ -182,6 +183,16 @@ tageswoche.tableData = do ->
       type: 'numeric' # set type, either numeric or text
     )
 
+
+  sortBySurname: (node) ->
+    $node = $(node)
+    if $node.data('col') == 'player'
+      buf = $node.text().split(' ')
+      buf[buf.length - 1]
+    else
+      $node.text()
+
+
   tablesorter: () ->
     headers = switch @current
       when "top"
@@ -198,6 +209,7 @@ tageswoche.tableData = do ->
       sortInitialOrder: "desc"
       rememberSorting: true
       headers: headers
+      textExtraction: @sortBySurname
 
   initEvents: () ->
 

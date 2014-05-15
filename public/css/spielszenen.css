@@ -166,6 +166,10 @@ body {
   height: 60px;
 }
 
+#stats {
+  position: relative;
+}
+
 /* navigation */
 #table-nav {
   border-bottom: 1px solid #ccc;
@@ -298,6 +302,12 @@ body {
   color: #333;
 }
 
+.last-update {
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+}
+
 #player-table td.graph {
   padding: 0 8px;
   vertical-align: bottom;
@@ -353,6 +363,10 @@ body {
 }
 
 @media (max-width: 420px) {
+
+  .last-update {
+    bottom: 12px;
+  }
 
   #scene-controls {margin-bottom: 0px;}
 

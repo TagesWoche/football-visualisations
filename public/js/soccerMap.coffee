@@ -154,7 +154,6 @@ class @SoccerMap extends RaphaelMap
 
 
   updateInfo: ->
-    #console.log(@scene.score)
     $("#scene-result .score").html(@scene.score)
     $("#scene-result .left span").html("FCB")
     $("#scene-result .right span").html(@scene.opponent.toUpperCase()) if @scene.opponent
@@ -218,7 +217,7 @@ class @SoccerMap extends RaphaelMap
 
   drawPasses: ->
     lastPosition = undefined
-    for action in @actions
+    for action, index in @actions
       if action.running
         @drawSprint(action.start, action.end)
 
@@ -228,6 +227,12 @@ class @SoccerMap extends RaphaelMap
       if action.foul
         # don't draw a pass from a foul position to the next one
         lastPosition = undefined
+      else if action.shot
+        if index + 1 < @actions.length
+          nextAction = @actions[index + 1]
+
+        lastPosition = undefined
+        @drawShot(action.end, action.shotTarget, nextAction?.start)
       else
         lastPosition = action.end
 
@@ -278,6 +283,7 @@ class @SoccerMap extends RaphaelMap
     path = curve.wavy(start, end, "10%")
     @map.path(path).attr({ fill:"", stroke: @playerColor, "stroke-width": 2 })
 
+
   addPass: (start, end) ->
     path = curve.curve(start, end, "10%", 0.6, "right")
     startGap = 0
@@ -288,27 +294,56 @@ class @SoccerMap extends RaphaelMap
 
     @map.path(subCurve).attr({ fill:"", stroke: @white, "stroke-width": 2 })
 
+
   drawGoal: (start) ->
-    end = field.goalPosition( @scene.scorePosition.toLowerCase() )
+    scorePosition = @scene.scorePosition.toLowerCase()
+    end = field.goalPosition(scorePosition, 4)
+
+    yCorrection = if @scene.highKick then 14 else 3
+    @curveWithShadow(start: start, end: end, yCorrection: yCorrection, curvedness: '8%', arrow: true)
+
+
+  drawShot: (start, scorePosition, next) ->
+    end = field.goalPosition(scorePosition, 10, -8)
+    foot = @getFoot(start, end)
+
+    yCorrection = if @scene.highKick then 14 else 3
+    @curveWithShadow(start: start, end: end, yCorrection: yCorrection, curvedness: '8%', strokeWidth: 2)
+
+    # rebound
+    if next?
+      yCorrection = if @scene.highKick then 14 else 3
+      @curveWithShadow(start: next, end: end, yCorrection: yCorrection, curvedness: '1%', strokeWidth: 2)
+
+
+  curveWithShadow: ({ start, end, yCorrection, foot, curvedness, arrow, strokeWidth }) ->
+    foot = @getFoot(start, end)
+    curvedness ?= 0
+    strokeWidth ?= 3
+    xCorrection = if field.playDirection == "right" then -5 else 5
+    yCorrection ?= if @scene.highKick then 14 else 3
+    endShadowX = end.x + (xCorrection * field.scale)
+    endShadowY = end.y + (yCorrection * field.scale)
+    path = curve.curve(start, { x: endShadowX, y: endShadowY }, curvedness, 0.6, foot)
+    if arrow
+      @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: strokeWidth, color: @darkGrey, opacity: @shadowOpacity })
+    @map.path(path).attr({ fill:"", stroke:  @darkGrey, "stroke-width": strokeWidth, opacity: @shadowOpacity })
+
+    # shoot
+    path = curve.curve(start, end, curvedness, 0.6, foot)
+    if arrow
+      @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: strokeWidth })
+    @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": strokeWidth })
+
+
+  getFoot: (start, end) ->
     foot = if start.y < end.y then "left" else "right"
 
     # reverse foot depending on playDirection (so the ball flies towards the goal which looks more natural)
     if field.playDirection == "right"
       foot = if foot == "left" then "right" else "left"
 
-    # shadow (to discern high and low kicks)
-    xCorrection = if field.playDirection == "right" then -5 else 5
-    yCorrection = if @scene.highKick then 14 else 3
-    endShadowX = end.x + (xCorrection * field.scale)
-    endShadowY = end.y + (yCorrection * field.scale)
-    path = curve.curve(start, { x: endShadowX, y: endShadowY }, "8%", 0.6, foot)
-    @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3, color: @darkGrey, opacity: @shadowOpacity })
-    @map.path(path).attr({ fill:"", stroke:  @darkGrey, "stroke-width": 3, opacity: @shadowOpacity })
-
-    # shoot
-    path = curve.curve(start, end, "8%", 0.6, foot)
-    @drawArrow(path, { size: 10, pointyness: 0.3, strokeWidth: 3 })
-    @map.path(path).attr({ fill:"", stroke: @white, "stroke-width": 3 })
+    foot
 
 
   drawArrow: (path, { length, size, pointyness, strokeWidth, color, opacity }) ->
