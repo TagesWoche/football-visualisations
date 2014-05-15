@@ -297,11 +297,11 @@
     };
 
     SoccerMap.prototype.drawPasses = function() {
-      var action, lastPosition, _i, _len, _ref;
+      var action, index, lastPosition, nextAction, _i, _len, _ref;
       lastPosition = void 0;
       _ref = this.actions;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        action = _ref[_i];
+      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+        action = _ref[index];
         if (action.running) {
           this.drawSprint(action.start, action.end);
         }
@@ -310,6 +310,12 @@
         }
         if (action.foul) {
           lastPosition = void 0;
+        } else if (action.shot) {
+          if (index + 1 < this.actions.length) {
+            nextAction = this.actions[index + 1];
+          }
+          lastPosition = void 0;
+          this.drawShot(action.end, action.shotTarget, nextAction != null ? nextAction.start : void 0);
         } else {
           lastPosition = action.end;
         }
@@ -379,44 +385,100 @@
     };
 
     SoccerMap.prototype.drawGoal = function(start) {
-      var end, endShadowX, endShadowY, foot, path, xCorrection, yCorrection;
-      end = field.goalPosition(this.scene.scorePosition.toLowerCase());
-      foot = start.y < end.y ? "left" : "right";
-      if (field.playDirection === "right") {
-        foot = foot === "left" ? "right" : "left";
+      var end, scorePosition, yCorrection;
+      scorePosition = this.scene.scorePosition.toLowerCase();
+      end = field.goalPosition(scorePosition, 4);
+      yCorrection = this.scene.highKick ? 14 : 3;
+      return this.curveWithShadow({
+        start: start,
+        end: end,
+        yCorrection: yCorrection,
+        curvedness: '8%',
+        arrow: true
+      });
+    };
+
+    SoccerMap.prototype.drawShot = function(start, scorePosition, next) {
+      var end, foot, yCorrection;
+      end = field.goalPosition(scorePosition, 10, -8);
+      foot = this.getFoot(start, end);
+      yCorrection = this.scene.highKick ? 14 : 3;
+      this.curveWithShadow({
+        start: start,
+        end: end,
+        yCorrection: yCorrection,
+        curvedness: '8%',
+        strokeWidth: 2
+      });
+      if (next != null) {
+        yCorrection = this.scene.highKick ? 14 : 3;
+        return this.curveWithShadow({
+          start: next,
+          end: end,
+          yCorrection: yCorrection,
+          curvedness: '1%',
+          strokeWidth: 2
+        });
+      }
+    };
+
+    SoccerMap.prototype.curveWithShadow = function(_arg) {
+      var arrow, curvedness, end, endShadowX, endShadowY, foot, path, start, strokeWidth, xCorrection, yCorrection;
+      start = _arg.start, end = _arg.end, yCorrection = _arg.yCorrection, foot = _arg.foot, curvedness = _arg.curvedness, arrow = _arg.arrow, strokeWidth = _arg.strokeWidth;
+      foot = this.getFoot(start, end);
+      if (curvedness == null) {
+        curvedness = 0;
+      }
+      if (strokeWidth == null) {
+        strokeWidth = 3;
       }
       xCorrection = field.playDirection === "right" ? -5 : 5;
-      yCorrection = this.scene.highKick ? 14 : 3;
+      if (yCorrection == null) {
+        yCorrection = this.scene.highKick ? 14 : 3;
+      }
       endShadowX = end.x + (xCorrection * field.scale);
       endShadowY = end.y + (yCorrection * field.scale);
       path = curve.curve(start, {
         x: endShadowX,
         y: endShadowY
-      }, "8%", 0.6, foot);
-      this.drawArrow(path, {
-        size: 10,
-        pointyness: 0.3,
-        strokeWidth: 3,
-        color: this.darkGrey,
-        opacity: this.shadowOpacity
-      });
+      }, curvedness, 0.6, foot);
+      if (arrow) {
+        this.drawArrow(path, {
+          size: 10,
+          pointyness: 0.3,
+          strokeWidth: strokeWidth,
+          color: this.darkGrey,
+          opacity: this.shadowOpacity
+        });
+      }
       this.map.path(path).attr({
         fill: "",
         stroke: this.darkGrey,
-        "stroke-width": 3,
+        "stroke-width": strokeWidth,
         opacity: this.shadowOpacity
       });
-      path = curve.curve(start, end, "8%", 0.6, foot);
-      this.drawArrow(path, {
-        size: 10,
-        pointyness: 0.3,
-        strokeWidth: 3
-      });
+      path = curve.curve(start, end, curvedness, 0.6, foot);
+      if (arrow) {
+        this.drawArrow(path, {
+          size: 10,
+          pointyness: 0.3,
+          strokeWidth: strokeWidth
+        });
+      }
       return this.map.path(path).attr({
         fill: "",
         stroke: this.white,
-        "stroke-width": 3
+        "stroke-width": strokeWidth
       });
+    };
+
+    SoccerMap.prototype.getFoot = function(start, end) {
+      var foot;
+      foot = start.y < end.y ? "left" : "right";
+      if (field.playDirection === "right") {
+        foot = foot === "left" ? "right" : "left";
+      }
+      return foot;
     };
 
     SoccerMap.prototype.drawArrow = function(path, _arg) {

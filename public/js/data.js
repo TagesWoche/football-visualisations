@@ -11,7 +11,8 @@
       "p": "penalty",
       "ps": "penaltyShootout",
       "ew": "throwIn",
-      "f": "foul"
+      "f": "foul",
+      "g": "shot"
     };
     return {
       scenes: void 0,
@@ -125,7 +126,7 @@
           dataType: "jsonp"
         }).done((function(_this) {
           return function(data) {
-            var action, entry, scene, scorePositionParts, _i, _j, _len, _len1, _ref;
+            var action, entry, scene, scorePositionParts, _i, _j, _len, _len1, _ref, _ref1;
             data = data.list;
             _this.scenes = [];
             for (_i = 0, _len = data.length; _i < _len; _i++) {
@@ -135,6 +136,9 @@
                 for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
                   action = _ref[_j];
                   if (action.specialCondition) {
+                    if (action.specialCondition.toLowerCase() === 'g') {
+                      action.shotTarget = (_ref1 = action.triedToScore) != null ? _ref1.toLowerCase() : void 0;
+                    }
                     action[specialConditionsAttr[action.specialCondition.toLowerCase()]] = true;
                   }
                 }

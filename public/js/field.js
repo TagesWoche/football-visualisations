@@ -52,13 +52,19 @@
         }
         return pos;
       },
-      goalPosition: function(scorePosition) {
+      goalPosition: function(scorePosition, xOffset, yOffset) {
         var height, index, position, x, y, _i, _len, _ref;
+        if (xOffset == null) {
+          xOffset = 12;
+        }
+        if (yOffset == null) {
+          yOffset = 0;
+        }
         position = {
           horizontal: 1,
           vertical: 6
         };
-        x = this.playDirection === "left" ? 12 : this.originalWidth - 12;
+        x = this.playDirection === "left" ? xOffset : this.originalWidth - xOffset;
         y = this.scorePosition[scorePosition];
         if (this.playDirection === "right") {
           y = 80 - y;
@@ -70,6 +76,7 @@
             y += height;
           }
         }
+        y = y + yOffset;
         return {
           x: this.scale * x,
           y: this.scale * y

@@ -204,6 +204,16 @@ tageswoche.tableData = do ->
       type: 'numeric' # set type, either numeric or text
     )
 
+
+  sortBySurname: (node) ->
+    $node = $(node)
+    if $node.data('col') == 'player'
+      buf = $node.text().split(' ')
+      buf[buf.length - 1]
+    else
+      $node.text()
+
+
   tablesorter: () ->
     headers = switch @current
       when "top"
@@ -220,6 +230,7 @@ tageswoche.tableData = do ->
       sortInitialOrder: "desc"
       rememberSorting: true
       headers: headers
+      textExtraction: @sortBySurname
 
   initEvents: () ->
 
