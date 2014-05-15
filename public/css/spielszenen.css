@@ -162,6 +162,10 @@ body {
 
 /* TABLE */
 
+.jqstooltip {
+  height: 60px;
+}
+
 #stats {
   position: relative;
 }

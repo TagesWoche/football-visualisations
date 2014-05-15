@@ -77,36 +77,11 @@ tageswoche.tableData = do ->
     $("#stats").html(templates.table({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
     @tablesorter()
 
+
   showScenesTable: () ->
-    $("#stats").html(templates.tableScenes({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
-    _.each($(".scoresList"), (playerEntry, idx) =>
-      $playerEntry = $(playerEntry)
-      playerScores = _.chain(@data.list[idx].scores)
-                        .map((scoreEntry) ->
-                          scoreEntry.scores
-                        )
-                        .last(@limit)
-                        .value()
-
-      gameNames =   _.chain(@data.list[0].scores)
-                      .map((gradeEntry) ->
-                          gradeEntry.opponent
-                      )
-                      .last(@limit)
-                      .value()
-
-      $playerEntry.sparkline(playerScores,
-        type: 'bar'
-        tooltipFormatter: (sparklines, options, fields) ->
-          "Gegner #{gameNames[fields[0].offset]}. <br/> Tore: #{fields[0].value}, Assists: #{fields[1].value}"
-        height: 15
-        barWidth: 12
-        barSpacing: 2
-
-      )
-    )
-
+    $("#stats").html(templates.tableScenes({ players : @data.list }))
     @tablesorter()
+
 
   showGamesTable: () ->
     $("#stats").html(templates.tableGames({ players : @data.list, lastUpdate: moment(@data.lastUpdate), season: @data.season }))
@@ -156,11 +131,15 @@ tageswoche.tableData = do ->
       $playerEntry.sparkline(playerValues,
         type: 'bar'
         tooltipFormatter: (sparklines, options, fields) ->
-          if fields[0].value == 0
-            "Gegner #{gameNames[fields[0].offset]}. keine Bewertung"
+          if fields[0].value != 0
+            """
+              <div style="padding-right: 10px">
+                Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value}. <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}
+              </div>
+            """
           else
-            "Gegner #{gameNames[fields[0].offset]}. Note: #{fields[0].value} <br/>Mannschafts-Durchschnitt: #{totalValues[fields[0].offset]}"
-
+            ""
+        tooltipContainer: $('#stats')
         height: 15
         barWidth: 12
         barSpacing: 2

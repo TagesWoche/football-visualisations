@@ -108,31 +108,8 @@
       },
       showScenesTable: function() {
         $("#stats").html(templates.tableScenes({
-          players: this.data.list,
-          lastUpdate: moment(this.data.lastUpdate),
-          season: this.data.season
+          players: this.data.list
         }));
-        _.each($(".scoresList"), (function(_this) {
-          return function(playerEntry, idx) {
-            var $playerEntry, gameNames, playerScores;
-            $playerEntry = $(playerEntry);
-            playerScores = _.chain(_this.data.list[idx].scores).map(function(scoreEntry) {
-              return scoreEntry.scores;
-            }).last(_this.limit).value();
-            gameNames = _.chain(_this.data.list[0].scores).map(function(gradeEntry) {
-              return gradeEntry.opponent;
-            }).last(_this.limit).value();
-            return $playerEntry.sparkline(playerScores, {
-              type: 'bar',
-              tooltipFormatter: function(sparklines, options, fields) {
-                return "Gegner " + gameNames[fields[0].offset] + ". <br/> Tore: " + fields[0].value + ", Assists: " + fields[1].value;
-              },
-              height: 15,
-              barWidth: 12,
-              barSpacing: 2
-            });
-          };
-        })(this));
         return this.tablesorter();
       },
       showGamesTable: function() {
@@ -177,12 +154,13 @@
             return $playerEntry.sparkline(playerValues, {
               type: 'bar',
               tooltipFormatter: function(sparklines, options, fields) {
-                if (fields[0].value === 0) {
-                  return "Gegner " + gameNames[fields[0].offset] + ". keine Bewertung";
+                if (fields[0].value !== 0) {
+                  return "<div style=\"padding-right: 10px\">\n  Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + ". <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset] + "\n</div>";
                 } else {
-                  return "Gegner " + gameNames[fields[0].offset] + ". Note: " + fields[0].value + " <br/>Mannschafts-Durchschnitt: " + totalValues[fields[0].offset];
+                  return "";
                 }
               },
+              tooltipContainer: $('#stats'),
               height: 15,
               barWidth: 12,
               barSpacing: 2,

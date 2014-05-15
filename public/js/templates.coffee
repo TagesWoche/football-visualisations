@@ -164,7 +164,7 @@
           <th>Assists</th>
           <th>Scorerpunkte*</th>
           <th>Minuten pro Scorerpunkt</th>
-          <th class="graph-column">Letzte Spiele</th>
+          <th class="graph-column">Scorerpunkte letzte 10 Spiele</th>
         </tr>
       </thead>
       <tbody>
@@ -176,7 +176,7 @@
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.assists ) %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.goals + player.assists ) %></td>
             <td class="center top-table"><%= tageswoche.tableData.aboveNullRounded( player.minutes / (player.goals + player.assists) ) %></td>
-            <td class="scoresList bar graph graph-column"></td>
+            <td class="center top-table"><%= _.reduce(_.last(player.scores, 10), function(memo, entry){ return memo + +entry.scores[0] + +entry.scores[1] }, 0) %></td>
           </tr>
         <% }); %>
       </tbody>
