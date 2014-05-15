@@ -221,6 +221,16 @@
           type: 'numeric'
         });
       },
+      sortBySurname: function(node) {
+        var $node, buf;
+        $node = $(node);
+        if ($node.data('col') === 'player') {
+          buf = $node.text().split(' ');
+          return buf[buf.length - 1];
+        } else {
+          return $node.text();
+        }
+      },
       tablesorter: function() {
         var headers;
         headers = (function() {
@@ -248,7 +258,8 @@
         return $("#player-table").tablesorter({
           sortInitialOrder: "desc",
           rememberSorting: true,
-          headers: headers
+          headers: headers,
+          textExtraction: this.sortBySurname
         });
       },
       initEvents: function() {
