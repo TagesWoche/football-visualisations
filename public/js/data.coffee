@@ -12,6 +12,7 @@ tageswoche.data = do ->
     "ew": "throwIn"
     "f" : "foul"
     "g" : "shot"
+    "gegenspieler" : "opponent"
 
   scenes: undefined
   games: {}

@@ -260,6 +260,9 @@ class @SoccerMap extends RaphaelMap
       if action.penalty || action.directFreeKick || action.indirectFreeKick
         currentAttributes = $.extend({}, currentAttributes, { stroke: @white })
 
+      if action.opponent
+        currentAttributes = @opponentAttributes
+
       # player position
       circle = @map.circle(player.x, player.y, @circleRadius).attr(currentAttributes)
       $circle = jQuery(circle.node)

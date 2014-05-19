@@ -12,7 +12,8 @@
       "ps": "penaltyShootout",
       "ew": "throwIn",
       "f": "foul",
-      "g": "shot"
+      "g": "shot",
+      "gegenspieler": "opponent"
     };
     return {
       scenes: void 0,

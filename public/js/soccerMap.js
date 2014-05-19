@@ -311,6 +311,9 @@
             stroke: this.white
           });
         }
+        if (action.opponent) {
+          currentAttributes = this.opponentAttributes;
+        }
         circle = this.map.circle(player.x, player.y, this.circleRadius).attr(currentAttributes);
         $circle = jQuery(circle.node);
         $circle.attr("data-toggle", "tooltip");
