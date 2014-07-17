@@ -188,7 +188,12 @@
 
     SoccerMap.prototype.updateInfo = function() {
       var $gameLink, game, scene, sceneIndex, ul, _i, _len, _results;
-      $("#scene-result .score").html(this.scene.score);
+      $("#scene-result .score").html(this.scene.score.replace("-", ":"));  
+      var year,month,day;
+      year = this.scene.date.substring(0,4);
+      month = this.scene.date.substring(5,7);
+      day = this.scene.date.substring(8,10);     
+      $("#gamedate").text(day + "." + month + "." + year);
       $("#scene-result .left span").html("FCB");
       if (this.scene.opponent) {
         $("#scene-result .right span").html(this.scene.opponent.toUpperCase());
@@ -259,10 +264,16 @@
     SoccerMap.prototype.sceneInfo = function() {
       var desc;
       this.extractSceneInfo();
-      desc = $("#scene-desc").html("").append("<em>" + this.scene.team + " &ndash; " + this.scene.minute + ". Minute:</em>").append("<span>Tor: <strong>" + this.scene.goal + "</strong></span>");
-      if (this.scene.assist) {
-        return desc.append("<span>Assist: <strong>" + this.scene.assist + "</strong></span>");
+      if (this.scene.team == "FCB") {
+      desc = $("#scene-desc").html("").append("Tor " + this.scene.team + ":").append("<strong> " + this.scene.actions[this.scene.actions.length -1].fullname + "</strong>");
       }
+      else {
+	      desc = $("#scene-desc").html("").append("Tor " + this.scene.team + ":").append("<strong> " + this.scene.goal + "</strong>");
+      }
+      if (this.scene.assist) {
+        return desc.append(" (Assist: <strong>" + this.scene.assist + ")</strong>");
+      }
+      console.log(this.scene);
     };
 
     SoccerMap.prototype.drawPasses = function() {

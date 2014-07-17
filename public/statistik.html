@@ -2,25 +2,42 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Tageswoche - Statistiken</title>
-    
+    <meta name="viewport" content = "width = device-width, initial-scale = 1, minimum-scale = 1, maximum-scale = 2" />
+
+    <title>Tageswoche - Statistik</title>
+
     <link href="css/spielszenen.css" rel="stylesheet">
-    
+    <link href="css/bootstrap-tooltip.css" rel="stylesheet">
+
+    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script> -->
+
+    <!-- scenes -->
     <script src="js/vendor/jquery-1.7.2.min.js"></script>
-    <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/raphael-min.js"></script>
+    <script src="js/vendor/bootstrap-tooltip.js"></script>
+
+    <!-- statistics -->
+    <script src="js/vendor/jquery.tablesorter.js"></script>
+
+
     <script src="js/vendor/underscore.js"></script>
+    <script src="js/vendor/sparklines.min.js"></script>
+    <script src="js/vendor/moment.min.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/tableData.js"></script>
-    <!-- <script src="js/vendor/jquery.tablesorter.js"></script>-->
-    <script src="js/vendor/jquery.tablesorter.js"></script>
+
+
+    <!--<script src="twfs-min.js"></script>-->
   </head>
   <body>
     <div id="container">
+
+      <!-- statistics -->
       <div id="table-container">
 
         <div id="table-nav">
           <ul>
-            <li><a href="" class="top-table active">&Uuml;bersicht</a></li>
+            <li><a href="" class="top-table active">Übersicht</a></li>
             <li><a href="" class="games-table">Bewertungen</a></li>
             <li><a href="" class="scenes-table">Tore</a></li>
           </ul>
@@ -31,7 +48,7 @@
             <select name="location" id="location-filter">
             	<option value="">Alle Spiele</option>
             	<option value="home">Heimspiele</option>
-            	<option value="out">Ausw�rtsspiele</option>
+            	<option value="out">Auswärtsspiele</option>
             </select>
             <select name="competition" id="competition-filter">
             	<option value="">Alle Wettbewerbe</option>
@@ -40,8 +57,8 @@
             	<option value="euro">International</option>
             </select>
             <select name="saison" id="saison-filter">
-              <option value="12/13">12/13</option>
               <option value="13/14">13/14</option>
+              <option value="12/13">12/13</option>
             </select>
             </form>
           </div>
@@ -52,12 +69,17 @@
           <div class="loading">loading...</div>
         </div>
       </div>
+
+      
     </div>
-    
-    <script>
-    $(document).ready(function() {
-      tageswoche.tableData.init();
-    });
-    </script>
+
+  <script>
+  jQuery(document).ready(function() {
+    tageswoche.tableData.init();
+
+    // moment language
+    moment.lang('de');
+  });
+  </script>
   </body>
 </html>
